@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 5: Object Detection | YOLO | Real-Time Person Counter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f4f9;
+            font-family: 'Inter', sans-serif;
+            color: #0a2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* hero header */
+        .hero {
+            background: linear-gradient(135deg, #0e3d2f 0%, #1c6e50 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.25);
+        }
+        .badge-day {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.92;
+            max-width: 80%;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+        }
+        .card-header {
+            padding: 1.4rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #1c6e50;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.6rem 2rem 2rem 2rem;
+        }
+
+        /* insight grid */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .insight-card {
+            background: #fafeff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-left: 5px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .insight-card.what { border-left-color: #2c7da0; }
+        .insight-card.why { border-left-color: #f4a261; }
+        .insight-card.how { border-left-color: #2a9d8f; }
+        .insight-card.where { border-left-color: #e76f51; }
+        .insight-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0f212e;
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #f4a261;
+        }
+
+        .two-col-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .demo-card {
+            flex: 1;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #e2e9f0;
+        }
+        .tag {
+            background: #e5f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: #fff7eb;
+            border-left: 5px solid #f4a261;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .project-workflow {
+            background: linear-gradient(145deg, #1a4d3c, #0e3a2c);
+            border-radius: 1.6rem;
+            padding: 1.5rem;
+            color: #f0f6fa;
+            margin-top: 1rem;
+        }
+        .workflow-step {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            align-items: flex-start;
+        }
+        .step-badge {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mock-camera {
+            background: #2c5e4a;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            font-family: monospace;
+            margin: 1rem 0;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: #cde0ea;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #cde0ea;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .card-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <span class="badge-day">🎯 DAY 5 · OBJECT DETECTION</span>
+        <h1>YOLO, SSD, Faster R-CNN & Real-Time Person Counter</h1>
+        <div class="hero-sub">From sliding windows to state-of-the-art detectors — locate and track multiple objects in images and live video feeds.</div>
+    </div>
+
+    <!-- WHAT / WHY / HOW / WHERE of Object Detection -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 Understanding Object Detection: What, Why, How, Where</h2>
+        </div>
+        <div class="card-body">
+            <div class="insight-grid">
+                <div class="insight-card what">
+                    <div class="insight-title">❓ WHAT is Object Detection?</div>
+                    <p>Identify and <strong>localize</strong> all objects of interest in an image/video. Output: bounding boxes + class labels (e.g., person, car, dog). Unlike classification, it tells <em>where</em> objects are.</p>
+                    <div class="mock-camera" style="background:#e2e8f0; color:#1a4d3c;">📷 [ person: x=120,y=200,w=80,h=220 ]</div>
+                </div>
+                <div class="insight-card why">
+                    <div class="insight-title">🎯 WHY Object Detection?</div>
+                    <p>Autonomous vehicles (pedestrians, cars), surveillance (intruders), medical imaging (tumor detection), retail (shelf analysis), face detection, and interactive systems.</p>
+                </div>
+                <div class="insight-card how">
+                    <div class="insight-title">⚙️ HOW does it work?</div>
+                    <p><strong>Two-stage</strong> (Faster R-CNN): region proposals → classify each.<br>
+                       <strong>One-stage</strong> (YOLO, SSD): predict boxes & classes directly in single pass → extremely fast.</p>
+                </div>
+                <div class="insight-card where">
+                    <div class="insight-title">🌍 WHERE applied?</div>
+                    <p>Traffic cameras, robotics, retail analytics, sports tracking, augmented reality, wildlife monitoring, industrial quality control.</p>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Key evolution:</strong> Sliding windows (slow, brute-force) → Region proposals (Selective Search) → YOLO (real-time, single neural network).
+            </div>
+        </div>
+    </div>
+
+    <!-- Sliding Windows vs Region Proposals vs YOLO -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔄 Evolution: Sliding Windows → Region Proposals → YOLO</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📦 Sliding Windows</span>
+                    <p>Slide a window across image at multiple scales & positions → classify each crop. Extremely slow (~10k+ windows per image), no bounding box regression.</p>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🧩 Region Proposals (R-CNN family)</span>
+                    <p>Generate ~2k candidate regions (Selective Search) → classify each with CNN. Faster R-CNN adds Region Proposal Network (RPN) → end-to-end trainable.</p>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">⚡ YOLO (You Only Look Once)</span>
+                    <p>Divide image into grid → each cell predicts bounding boxes + class probabilities. One forward pass → real-time (45-155 FPS). SSD is similar but uses multi-scale feature maps.</p>
+                </div>
+            </div>
+            <div class="code-block">
+                # Conceptual difference<br>
+                # Sliding windows: for each (x,y,scale): crop, classify<br>
+                # YOLO: CNN outputs SxSx(B*5 + C) tensor → decode boxes in one shot
+            </div>
+        </div>
+    </div>
+
+    <!-- YOLO v8/v5 Basics + Pre-trained Model -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🚀 YOLO (v5 & v8): Architecture & Pre-trained Models</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>YOLOv5/YOLOv8</strong> by Ultralytics: user-friendly, high performance, easy to deploy. Pre-trained on COCO dataset (80 classes: person, car, dog, ...).</p>
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📦 YOLOv8 (latest)</span>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        from ultralytics import YOLO<br>
+                        model = YOLO('yolov8n.pt')  # nano, small, medium, large<br>
+                        results = model('image.jpg')<br>
+                        results[0].show()  # displays boxes
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">📦 YOLOv5 (mature)</span>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        import torch<br>
+                        model = torch.hub.load('ultralytics/yolov5', 'yolov5s')<br>
+                        results = model('image.jpg')<br>
+                        results.print()
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                💡 <strong>Model sizes:</strong> YOLOv8n (nano) → fastest, less accurate. YOLOv8x (xlarge) → slower, highest accuracy. Choose based on your hardware.
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice: Detect objects in video frame -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🎬 Practice: Detect Objects in a Video Frame</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📹 Single frame detection</span>
+                    <div class="code-block">
+                        cap = cv2.VideoCapture('video.mp4')<br>
+                        ret, frame = cap.read()<br>
+                        results = model(frame)<br>
+                        annotated = results[0].plot()<br>
+                        cv2.imshow('Detection', annotated)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🖍️ Draw bounding boxes manually</span>
+                    <div class="code-block">
+                        for box in results[0].boxes:<br>
+                        &nbsp;&nbsp; x1,y1,x2,y2 = map(int, box.xyxy[0])<br>
+                        &nbsp;&nbsp; conf = box.conf[0]<br>
+                        &nbsp;&nbsp; cls = box.cls[0]<br>
+                        &nbsp;&nbsp; cv2.rectangle(frame, (x1,y1), (x2,y2), (0,255,0), 2)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🎯 <strong>Expected output:</strong> Video frames with bounding boxes around detected objects (person, car, etc.) + confidence scores.
+            </div>
+        </div>
+    </div>
+
+    <!-- MINI PROJECT: Real-Time Person Counter (Webcam) - Full Workflow -->
+    <div class="card">
+        <div class="card-header">
+            <h2>👥 Mini Project: Real-Time Person Counter</h2>
+        </div>
+        <div class="card-body">
+            <div class="project-workflow">
+                <span style="font-weight:800; font-size:1.3rem;">📸 Detect people in webcam feed and count them in real-time</span>
+                <p style="margin:0.6rem 0 0.8rem 0;">Goal: Open webcam → run YOLO on each frame → filter only 'person' class → display count on screen → update every frame.</p>
+                
+                <hr style="background:#3e8e6e; margin:0.8rem 0;">
+
+                <div class="workflow-step">
+                    <div class="step-badge">1</div>
+                    <div><strong>Setup & imports</strong> – Install ultralytics, opencv-python. Load YOLOv8n pre-trained model.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">2</div>
+                    <div><strong>Initialize webcam</strong> – cv2.VideoCapture(0) for default camera.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">3</div>
+                    <div><strong>Frame loop</strong> – read frame → run model detection → filter boxes where class == 0 (person in COCO).</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">4</div>
+                    <div><strong>Draw bounding boxes & count</strong> – draw green rectangles, putText with person count on top-left.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">5</div>
+                    <div><strong>Display & exit</strong> – cv2.imshow, break on 'q' key press.</div>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    # Real-Time Person Counter with YOLOv8<br>
+                    import cv2<br>
+                    from ultralytics import YOLO<br>
+                    <br>
+                    # Load model<br>
+                    model = YOLO('yolov8n.pt')  # COCO pre-trained<br>
+                    <br>
+                    # Open webcam (0 = default camera)<br>
+                    cap = cv2.VideoCapture(0)<br>
+                    <br>
+                    while True:<br>
+                        ret, frame = cap.read()<br>
+                        if not ret:<br>
+                            break<br>
+                        <br>
+                        # Run YOLO inference<br>
+                        results = model(frame, verbose=False)<br>
+                        <br>
+                        # Filter person class (COCO class ID 0 = 'person')<br>
+                        person_count = 0<br>
+                        for box in results[0].boxes:<br>
+                            cls_id = int(box.cls[0])<br>
+                            if cls_id == 0:  # person class<br>
+                                person_count += 1<br>
+                                x1, y1, x2, y2 = map(int, box.xyxy[0])<br>
+                                conf = float(box.conf[0])<br>
+                                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)<br>
+                                cv2.putText(frame, f'person {conf:.2f}', (x1, y1-5),<br>
+                                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1)<br>
+                        <br>
+                        # Display count on frame<br>
+                        cv2.putText(frame, f'People Count: {person_count}', (10, 30),<br>
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)<br>
+                        <br>
+                        cv2.imshow('Real-Time Person Counter', frame)<br>
+                        if cv2.waitKey(1) & 0xFF == ord('q'):<br>
+                            break<br>
+                    <br>
+                    cap.release()<br>
+                    cv2.destroyAllWindows()
+                </div>
+
+                <div class="mock-camera" style="background:#2c5e4a; margin-top: 1rem;">
+                    🎥 [WEBCAM FEED] → Detected: 3 people → Bounding boxes drawn → Counter = 3
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 1.2rem;">
+                🧪 <strong>Test it yourself:</strong> Stand in front of your webcam with friends. The counter updates in real-time. Try with multiple people, partial occlusions — YOLO handles it robustly.
+                <br>⚡ <strong>Optimization tip:</strong> For faster FPS, use YOLOv8n (nano) or reduce frame size with cv2.resize().
+            </div>
+        </div>
+    </div>
+
+    <!-- SSD & Faster R-CNN Comparison -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⚖️ SSD & Faster R-CNN: Alternative Approaches</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📐 SSD (Single Shot MultiBox Detector)</span>
+                    <p>Like YOLO but uses multi-scale feature maps for better small object detection. Good speed/accuracy tradeoff. Pre-trained models available in PyTorch.</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        # torchvision SSD<br>
+                        model = torchvision.models.detection.ssd300_vgg16(pretrained=True)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🐉 Faster R-CNN</span>
+                    <p>Two-stage: Region Proposal Network (RPN) + classifier. Higher accuracy than one-stage, but slower (~5-10 FPS). Best for applications needing precise localization.</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                📊 <strong>When to choose?</strong> YOLO → real-time (30+ FPS), SSD → balanced, Faster R-CNN → max accuracy (medical, satellite). For person counter, YOLOv8 is perfect.
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice recap + Additional Challenges -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧪 Practice Recap & Extension Challenges</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.7rem;">
+                <li>✅ <strong>Done:</strong> Detect objects in a single video frame with YOLO.</li>
+                <li>✅ <strong>Done:</strong> Draw bounding boxes and confidence scores.</li>
+                <li>✅ <strong>Mini Project:</strong> Real-time person counter via webcam.</li>
+            </ul>
+            <div class="highlight" style="margin-top: 1rem;">
+                🚀 <strong>Extension Challenges:</strong><br>
+                • Modify the counter to count only people in a specific zone (e.g., left half of frame).<br>
+                • Add FPS counter to monitor performance.<br>
+                • Save output video with detections using cv2.VideoWriter.<br>
+                • Track people across frames (add object tracking with DeepSORT).
+            </div>
+            <div class="code-block">
+                # Add FPS display<br>
+                import time<br>
+                prev_time = time.time()<br>
+                fps = 1/(current_time - prev_time)<br>
+                cv2.putText(frame, f'FPS: {fps:.1f}', (10, 60), ...)
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices & Cheatsheet -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 Best Practices for Object Detection</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>🔹 <strong>Confidence threshold:</strong> Filter low-confidence detections (e.g., only show boxes with conf > 0.5).</li>
+                <li>🔹 <strong>NMS (Non-Maximum Suppression):</strong> Removes duplicate bounding boxes for same object. YOLO applies automatically.</li>
+                <li>🔹 <strong>Input resolution:</strong> Higher resolution = slower but better for small objects. YOLO default 640x640 works well.</li>
+                <li>🔹 <strong>GPU acceleration:</strong> Use CUDA for real-time: <code>model = YOLO('yolov8n.pt').cuda()</code></li>
+                <li>🔹 <strong>Class filtering:</strong> For person counting, ignore other classes to reduce false positives.</li>
+            </ul>
+            <hr>
+            <div style="background: #eef3fc; border-radius: 1rem; padding: 1rem; text-align: center; margin-top: 0.8rem;">
+                🎯 <strong>Next step (Day 6):</strong> Image Segmentation & Face Recognition — pixel-level classification and identifying faces in images.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        🎯 Day 5 complete — You can now detect and count people in real-time using YOLO! This skill powers security systems, smart retail, and autonomous robots.<br>
+        📹 Try running the person counter with different lighting conditions and group sizes.
+    </footer>
+</div>
+<script>
+    (function(){
+        console.log("%c🎯 Day 5: Object Detection — YOLO & Real-Time Person Counter Ready!", "color:#1c6e50; font-weight:bold; font-size:13px");
+        console.log("%c💡 Pro tip: Use YOLOv8n for webcam real-time, YOLOv8x for highest accuracy on images.", "background:#eef2f5; color:#d65c2a; padding:2px 6px; border-radius:8px;");
+    })();
+</script>
+</body>
+</html>
