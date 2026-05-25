@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Computer Vision Pipeline | AI Vision Systems · What · Why · How · Where</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4fa 0%, #e2eaf2 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #0a2b3c;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(125deg, #0f3b2c, #1c6e5e, #2a9d8f);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.01em;
+        }
+
+        .badge {
+            background: #1c6e5e10;
+            display: inline-block;
+            padding: 0.25rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1b6b5e;
+            margin-top: 0.5rem;
+        }
+
+        .subhead {
+            font-size: 1.1rem;
+            color: #2c5a4e;
+            max-width: 800px;
+            margin: 0.6rem auto 0;
+        }
+
+        /* vision pipeline flow */
+        .vision-pipeline {
+            background: rgba(255,255,250,0.8);
+            backdrop-filter: blur(3px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.08);
+            border: 1px solid rgba(200,230,220,0.7);
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 0.9rem 0.7rem;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 10px 15px -8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            border-bottom: 4px solid;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .step-icon {
+            font-size: 1.8rem;
+        }
+
+        .step-title {
+            font-weight: 800;
+            font-size: 0.85rem;
+            margin: 0.3rem 0;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #6b9e8e;
+        }
+
+        @media (max-width: 800px) {
+            .flow-arrow {
+                display: none;
+            }
+        }
+
+        /* explanation grid */
+        .exp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+
+        .exp-block {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border-left: 6px solid;
+        }
+
+        .exp-block h3 {
+            font-size: 1.45rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .qa {
+            margin: 0.9rem 0 0.5rem;
+        }
+
+        .q {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #1e5a4a;
+            display: inline-block;
+            background: #e6f4ef;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            margin-bottom: 0.4rem;
+        }
+
+        .answer {
+            color: #2d3e45;
+            line-height: 1.5;
+            font-size: 0.92rem;
+            margin-left: 0.2rem;
+            padding-left: 0.4rem;
+        }
+
+        .tech-tag {
+            background: #ecfdf5;
+            color: #0b5e42;
+            border-radius: 20px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.72rem;
+            display: inline-block;
+            margin: 0.3rem 0.2rem 0;
+            font-weight: 500;
+        }
+
+        .usecase {
+            background: #fef6e0;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            border-left: 3px solid #e9b35f;
+            font-size: 0.88rem;
+        }
+
+        .usecase strong {
+            color: #b85c0a;
+        }
+
+        .insight-box {
+            background: linear-gradient(115deg, #eef6f2, #ffffff);
+            border-radius: 1.4rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #3f6b5e;
+            background: #eef3f0;
+            padding: 1rem;
+            border-radius: 2rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #cbdde0, transparent);
+        }
+
+        @media (max-width: 550px) {
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>👁️ Computer Vision Pipeline</h1>
+        <div class="badge">📸 From Pixels to Perception · AI Vision Systems</div>
+        <div class="subhead">What, why, how and where — each component of a modern computer vision stack, from image acquisition to edge deployment, with real-world use cases.</div>
+    </div>
+
+    <!-- CV pipeline diagram -->
+    <div class="vision-pipeline">
+        <div class="flow-steps">
+            <div class="step-card" style="border-bottom-color: #2c7da0;">
+                <div class="step-icon">📷</div>
+                <div class="step-title">Image Acquisition</div>
+                <div style="font-size: 0.65rem;">Camera/Sensor</div>
+            </div>
+            <div class="flow-arrow">➡️</div>
+            <div class="step-card" style="border-bottom-color: #52b788;">
+                <div class="step-icon">🖼️</div>
+                <div class="step-title">Preprocessing</div>
+                <div style="font-size: 0.65rem;">Resize/Normalize</div>
+            </div>
+            <div class="flow-arrow">➡️</div>
+            <div class="step-card" style="border-bottom-color: #f4a261;">
+                <div class="step-icon">🧠</div>
+                <div class="step-title">Feature Extraction</div>
+                <div style="font-size: 0.65rem;">CNN/Transformer</div>
+            </div>
+            <div class="flow-arrow">➡️</div>
+            <div class="step-card" style="border-bottom-color: #e76f51;">
+                <div class="step-icon">🎯</div>
+                <div class="step-title">Task Head</div>
+                <div style="font-size: 0.65rem;">Detection/Seg/Cls</div>
+            </div>
+            <div class="flow-arrow">➡️</div>
+            <div class="step-card" style="border-bottom-color: #9c89b8;">
+                <div class="step-icon">📤</div>
+                <div class="step-title">Inference & Postprocess</div>
+                <div style="font-size: 0.65rem;">NMS / Threshold</div>
+            </div>
+            <div class="flow-arrow">➡️</div>
+            <div class="step-card" style="border-bottom-color: #70ae6e;">
+                <div class="step-icon">🚀</div>
+                <div class="step-title">Deployment</div>
+                <div style="font-size: 0.65rem;">Edge / Cloud</div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 1rem; font-size: 0.75rem; font-weight: 500; color: #2c7a5a;">Raw pixels → feature maps → predictions → actionable insights</div>
+    </div>
+
+    <!-- Detailed components: What, Why, How, Where + use cases -->
+    <div class="exp-grid">
+        <!-- 1. Image Acquisition & Sensors -->
+        <div class="exp-block" style="border-left-color: #2c7da0;">
+            <h3><span>📷</span> Image Acquisition</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Capturing visual data via RGB cameras, depth sensors (LiDAR, ToF), thermal, or multispectral imaging. Frame rates, resolution, and encoding formats (JPEG, RAW, H.264).</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Foundation of any CV system. Quality, lighting, and sensor noise directly impact downstream model performance. High dynamic range & resolution improve small object detection.</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">Use industrial cameras (Basler, FLIR), USB webcams, or smartphone sensors. Streaming via GStreamer, V4L2, or ROS for robotics. Frame grabbing with OpenCV or FFmpeg.</div>
+                <span class="tech-tag">OpenCV</span> <span class="tech-tag">GStreamer</span> <span class="tech-tag">ROS</span> <span class="tech-tag">Intel RealSense</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">On-edge devices (IP cameras, drones, autonomous vehicles), mobile phones, or medical imaging systems (MRI, CT). Connected via Ethernet, USB, or MIPI CSI.</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Autonomous Quality Inspection</strong> — 4K industrial cameras mounted on assembly line capture 120 fps PCB images; synchronized with PLC for real-time defect detection.</div>
+        </div>
+
+        <!-- 2. Preprocessing & Normalization -->
+        <div class="exp-block" style="border-left-color: #52b788;">
+            <h3><span>🖼️</span> Preprocessing & Augmentation</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Resizing, normalization (0-1 or mean/std), histogram equalization, denoising, and geometric augmentations (rotation, flip, crop, color jitter).</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Reduces variability in lighting/scale, improves convergence. Augmentation boosts model robustness to real-world transformations and reduces overfitting.</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">OpenCV transforms, Albumentations, torchvision.transforms, or TensorFlow Image. Use GPU-accelerated preprocessing (DALI) for real-time pipelines.</div>
+                <span class="tech-tag">Albumentations</span> <span class="tech-tag">OpenCV</span> <span class="tech-tag">imgaug</span> <span class="tech-tag">DALI</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">During training (online augmentation) or as a separate ETL step. In inference, applied on raw camera frames before model forward pass (edge or cloud).</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Face Recognition for Access Control</strong> — Apply random lighting adjustment, rotation (±10°), and blur to training set of 10k faces, improving recognition under low-light and off-angle by 27%.</div>
+        </div>
+
+        <!-- 3. Feature Extraction (Backbone) -->
+        <div class="exp-block" style="border-left-color: #f4a261;">
+            <h3><span>🧠</span> Feature Extraction (Backbone)</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Deep CNN or Vision Transformer (ViT) that converts raw pixels into hierarchical feature maps (edges → textures → parts → objects). Common backbones: ResNet, EfficientNet, ConvNeXt, ViT.</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Extracts semantically rich representations from visual data. Backbone quality determines upper bound of task performance (detection/segmentation).</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">Use pretrained backbones (ImageNet) via PyTorch/TensorFlow Hub, or train from scratch. Implement with convolutional layers, attention mechanisms, skip connections.</div>
+                <span class="tech-tag">ResNet50</span> <span class="tech-tag">EfficientNet</span> <span class="tech-tag">Swin Transformer</span> <span class="tech-tag">ConvNeXt</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">Executes on GPU/TPU during training. During inference, runs on edge AI accelerators (NVIDIA Jetson, Google Coral, Hailo) or cloud GPUs.</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Satellite Imagery Analysis (Flood Detection)</strong> — Fine-tune EfficientNet-B4 on Sentinel-2 imagery to extract features for flood segmentation, achieving 92% IoU with limited labeled data via transfer learning.</div>
+        </div>
+
+        <!-- 4. Task-Specific Head -->
+        <div class="exp-block" style="border-left-color: #e76f51;">
+            <h3><span>🎯</span> Task Head (Detection / Seg / Cls)</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Specialized output layers: classification (softmax), object detection (bounding boxes + class), segmentation (pixel-wise masks), pose estimation (keypoints).</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Converts backbone features into actionable predictions for specific CV task. Different heads produce different output formats and loss functions.</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">Detection: YOLO head, SSD, Faster R-CNN RPN. Segmentation: FPN, UNet decoder, DeepLab. Classification: Global Avg Pool + FC layers.</div>
+                <span class="tech-tag">YOLOv8</span> <span class="tech-tag">Mask R-CNN</span> <span class="tech-tag">DeepLabV3+</span> <span class="tech-tag">UNet</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">Part of the neural network model; executed on same hardware as backbone. Outputs post-processed on CPU or GPU depending on latency needs.</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Retail Shelf Analysis</strong> — YOLOv8 detection head identifies product SKUs and counts items; trained on 50k shelf images to detect 200+ product categories with 0.85 mAP@0.5.</div>
+        </div>
+
+        <!-- 5. Inference & Postprocessing -->
+        <div class="exp-block" style="border-left-color: #9c89b8;">
+            <h3><span>⚙️</span> Inference & Postprocessing</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Running the model on new images, applying NMS (Non-Maximum Suppression), confidence thresholding, and converting raw outputs to interpretable results (boxes, masks).</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Raw model outputs (e.g., 10k candidate boxes) are noisy. Postprocessing cleans up duplicates, filters low-confidence predictions, and formats for downstream tasks.</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">NMS algorithms, Soft-NMS, or class-specific filters. Use GPU-accelerated CUDA NMS or CPU libraries (OpenCV, NumPy). Batch inference with ONNX Runtime/TensorRT.</div>
+                <span class="tech-tag">NMS</span> <span class="tech-tag">TensorRT</span> <span class="tech-tag">ONNX</span> <span class="tech-tag">OpenCV dnn</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">On edge device (real-time) or cloud server. Integrated into inference pipeline after model forward pass, before sending results to application.</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Autonomous Driving Perception</strong> — Inference on 8 surround cameras (30 FPS), postprocess with fast CUDA NMS and tracking (SORT), output filtered bounding boxes to planning module within 20ms.</div>
+        </div>
+
+        <!-- 6. Deployment & Optimization (Edge/Cloud) -->
+        <div class="exp-block" style="border-left-color: #70ae6e;">
+            <h3><span>🚀</span> Deployment & Optimization</h3>
+            <div class="qa"><span class="q">❓ WHAT</span>
+                <div class="answer">Converting trained models to efficient formats (ONNX, TensorRT, TFLite), quantization (INT8/FP16), and deploying to edge devices (Jetson, Raspberry Pi) or cloud APIs.</div>
+            </div>
+            <div class="qa"><span class="q">💡 WHY</span>
+                <div class="answer">Real-world CV requires low latency & small memory footprint. Optimization reduces inference time by 3-10x and enables edge deployment without cloud dependency.</div>
+            </div>
+            <div class="qa"><span class="q">🔧 HOW</span>
+                <div class="answer">Use TensorRT for NVIDIA GPUs, OpenVINO for Intel, TFLite for mobile, or CoreML for iOS. Prune/fuse layers, quantize weights, use model distillation.</div>
+                <span class="tech-tag">TensorRT</span> <span class="tech-tag">OpenVINO</span> <span class="tech-tag">TFLite</span> <span class="tech-tag">ONNX Runtime</span>
+            </div>
+            <div class="qa"><span class="q">📍 WHERE</span>
+                <div class="answer">Edge devices (cameras, drones, robots), mobile apps, or cloud endpoints (AWS Panorama, Azure Vision Edge). Model registry + CI/CD for versioning.</div>
+            </div>
+            <div class="usecase"><strong>🎯 Use case: Smart Doorbell (Person Detection)</strong> — Quantize MobileNetV3 SSD to INT8 using TensorRT Lite, deploy on Raspberry Pi 4, achieve 15ms inference at 5W power, detect visitors with 98% accuracy.</div>
+        </div>
+    </div>
+
+    <!-- Advanced Techniques & Infrastructure Table -->
+    <div class="insight-box">
+        <h3 style="display: flex; gap: 8px; font-size: 1.4rem; margin-bottom: 0.8rem;">⚡ Advanced Computer Vision Training Strategies</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 1rem;">
+            <div><span style="background:#2c7da020; padding: 0.2rem 0.5rem; border-radius: 20px;">🔄 Self-Supervised Learning</span><br>DINO, SimCLR — pretrain backbones without labels. Where: large unlabeled image datasets.</div>
+            <div><span style="background:#52b78820; padding: 0.2rem 0.5rem; border-radius: 20px;">📐 Multi-Scale Training</span><br>Train on different resolutions to improve scale invariance. Where: detection/segmentation pipelines.</div>
+            <div><span style="background:#f4a26120; padding: 0.2rem 0.5rem; border-radius: 20px;">🧪 Knowledge Distillation</span><br>Compress large teacher model to student for edge deployment. Where: model optimization stage.</div>
+            <div><span style="background:#e76f5120; padding: 0.2rem 0.5rem; border-radius: 20px;">🌍 Domain Adaptation</span><br>Adapt model from synthetic to real images. Where: robotics, autonomous driving sim2real.</div>
+        </div>
+        <hr>
+        <div style="background: #eef2ef; border-radius: 1rem; padding: 1rem; margin-top: 0.8rem;">
+            <strong>🔍 End-to-End Use Case: Real-Time Defect Detection in Manufacturing</strong><br>
+            <strong>Pipeline:</strong> 1. Image acquisition (5x 12MP cameras at 60 fps) → 2. Preprocessing (resize to 640x640, normalization) → 3. Backbone (EfficientNet-Lite) → 4. Detection head (YOLOv8-p6) → 5. Postprocessing (NMS + outlier removal) → 6. Deployment on NVIDIA Jetson ORIN with TensorRT FP16. <br>
+            <strong>Result:</strong> 0.2ms latency per image, 99.1% defect recall, 2000+ inspections per minute, reduced scrap cost by 34%.
+        </div>
+    </div>
+
+    <!-- Infrastructure mapping for CV components -->
+    <div style="background: white; border-radius: 1.6rem; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 6px 14px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 1rem;">📍 Where CV Components Run: Infrastructure Mapping</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead style="background: #e2ece7;">
+                    <tr><th style="padding: 10px; text-align: left;">Component</th><th style="padding: 10px; text-align: left;">Where (Typical Deployment)</th><th style="padding: 10px; text-align: left;">Hardware / Accelerators</th></tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #e0e8e4;"><td style="padding: 8px;">Image Acquisition</td><td style="padding: 8px;">Edge (Camera, Sensor Hub)</td><td style="padding: 8px;">MIPI CSI, USB3 Vision, GMSL2</td></tr>
+                    <tr style="border-bottom:1px solid #e0e8e4;"><td style="padding: 8px;">Preprocessing</td><td style="padding: 8px;">Edge or Cloud (GPU/CPU)</td><td style="padding: 8px;">CPU cores + GPU (DALI), ARM NEON</td></tr>
+                    <tr style="border-bottom:1px solid #e0e8e4;"><td style="padding: 8px;">Backbone + Task Head</td><td style="padding: 8px;">Training: Cloud GPU cluster<br>Inference: Edge/Cloud GPU/TPU</td><td style="padding: 8px;">NVIDIA A100/H100, Jetson Orin, Google TPU, Hailo-8</td></tr>
+                    <tr style="border-bottom:1px solid #e0e8e4;"><td style="padding: 8px;">Postprocessing (NMS)</td><td style="padding: 8px;">Edge CPU or GPU</td><td style="padding: 8px;">CUDA cores / ARM Cortex-A</td></tr>
+                    <tr><td style="padding: 8px;">Deployment & Monitoring</td><td style="padding: 8px;">Edge devices + cloud orchestrator</td><td style="padding: 8px;">Kubernetes Edge, AWS IoT Greengrass, Docker</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="footer" style="margin-top: 1.5rem; background: #f8fbf9;">
+            👁️ <strong>Key Takeaway:</strong> Computer vision systems transform visual data into decisions. Each component — from sensor to optimized inference — must be designed for accuracy, latency, and scale. Used in healthcare, autonomous systems, retail, security, and agriculture.
+        </div>
+    </div>
+    <div class="footer">
+        📸 Computer Vision Deep Dive — Comprehensive guide: acquisition → preprocessing → feature extraction → task head → postprocessing → deployment. With real-world use cases & infrastructure mapping.
+    </div>
+</div>
+</body>
+</html>
