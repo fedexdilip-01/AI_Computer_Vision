@@ -1,31 +1,27 @@
 # AI_Computer_Vision
 
 
-7-Day AI Computer Vision Program designed for someone with basic Python knowledge. Each day combines theory, hands-on coding, and a small project.
+### 7-Day AI Computer Vision Program 
 
-Day 1: Foundations & Image Basics
-Topics
+## Day 1: Foundations & Image Basics
 
+# Topics
 What is computer vision?
-
 Pixels, color spaces (RGB, Grayscale, HSV)
-
 Loading, displaying, and saving images
 
-Tools
-
+# Tools
 OpenCV, Matplotlib, NumPy
 
-Practice
+# Practice
 
 Convert RGB ↔ Grayscale ↔ HSV
-
 Split and merge color channels
 
-Mini Project
+#Mini Project
 Image Color Extractor – Extract dominant color channel and display histograms.</br>
 
-<h3>#Day 2: Image Processing & Transformations</h3>
+## Day 2: Image Processing & Transformations
 Topics
 
 Resizing, cropping, rotating, flipping
