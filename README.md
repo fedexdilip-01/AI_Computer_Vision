@@ -23,9 +23,9 @@ Convert RGB ↔ Grayscale ↔ HSV
 Split and merge color channels
 
 Mini Project
-Image Color Extractor – Extract dominant color channel and display histograms.
+Image Color Extractor – Extract dominant color channel and display histograms.</br>
 
-Day 2: Image Processing & Transformations
+<h3>#Day 2: Image Processing & Transformations</h3>
 Topics
 
 Resizing, cropping, rotating, flipping
