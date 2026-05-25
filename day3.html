@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 3: Feature Detection & Matching | Panorama Stitcher | AI Vision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f4f8;
+            font-family: 'Inter', sans-serif;
+            color: #0a2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* hero header */
+        .hero {
+            background: linear-gradient(135deg, #0a2e3f 0%, #1a5a6e 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.25);
+        }
+        .badge-day {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            font-size: 1.05rem;
+            opacity: 0.9;
+            max-width: 80%;
+        }
+
+        /* card layout */
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+            transition: transform 0.2s;
+        }
+        .card-header {
+            padding: 1.4rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #146b87;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.6rem 2rem 2rem 2rem;
+        }
+
+        /* grid for what/why/how/where */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .insight-card {
+            background: #f9fdfe;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-left: 5px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .insight-card.what { border-left-color: #2c7da0; }
+        .insight-card.why { border-left-color: #f4a261; }
+        .insight-card.how { border-left-color: #2a9d8f; }
+        .insight-card.where { border-left-color: #e76f51; }
+        .insight-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0f212e;
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #f4a261;
+        }
+
+        .two-col-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .demo-card {
+            flex: 1;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #e2e9f0;
+        }
+        .tag {
+            background: #e5f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: #fff7eb;
+            border-left: 5px solid #f4a261;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .project-pipeline {
+            background: linear-gradient(145deg, #1f3e48, #0f2f3c);
+            border-radius: 1.4rem;
+            padding: 1.5rem;
+            color: #f0f6fa;
+            margin-top: 1rem;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: #d4e2ec;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #cde0ea;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .card-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <span class="badge-day">📍 DAY 3 · FEATURE DETECTION & MATCHING</span>
+        <h1>🔍 Corners, Keypoints & Panorama Stitching</h1>
+        <div class="hero-sub">Understand how machines identify distinctive image regions and align multiple pictures into seamless panoramas using ORB + Homography.</div>
+    </div>
+
+    <!-- WHAT WHY HOW WHERE for Feature Detection -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 The "What, Why, How, Where" of Feature Detection</h2>
+        </div>
+        <div class="card-body">
+            <div class="insight-grid">
+                <div class="insight-card what">
+                    <div class="insight-title">❓ WHAT</div>
+                    <p>Features = distinctive patterns like <strong>corners, blobs, or keypoints</strong> that remain detectable under rotation, scaling, or illumination changes. Harris, Shi-Tomasi corners; SIFT and ORB descriptors.</p>
+                </div>
+                <div class="insight-card why">
+                    <div class="insight-title">🎯 WHY</div>
+                    <p>Match same object/scene across images, build panoramas, track objects, 3D reconstruction. Features act as visual fingerprints — robust to viewpoint changes.</p>
+                </div>
+                <div class="insight-card how">
+                    <div class="insight-title">⚙️ HOW</div>
+                    <p>Detect interest points → compute descriptors (numerical vectors) → compare descriptors using <strong>BFMatcher</strong> or <strong>FLANN</strong> → geometric verification (Homography).</p>
+                </div>
+                <div class="insight-card where">
+                    <div class="insight-title">🌍 WHERE</div>
+                    <p>Panorama stitching, AR markers, image registration, visual SLAM, object recognition, medical image alignment, satellite image merging.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORNERS: Harris & Shi-Tomasi + Example -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📍 Corner Detection: Harris & Shi-Tomasi</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📐 Harris Corner</span>
+                    <p><code>cv2.cornerHarris(gray, blockSize, ksize, k)</code> → detects corners by analyzing gradient intensity variations.</p>
+                    <div class="code-block" style="margin: 0.6rem 0;">
+                        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)<br>
+                        dst = cv2.cornerHarris(gray, 2, 3, 0.04)<br>
+                        img[dst>0.01*dst.max()] = [0,0,255]   # mark corners in red
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🎯 Shi-Tomasi (Good Features to Track)</span>
+                    <p>Improves Harris: returns N strongest corners. <code>cv2.goodFeaturesToTrack()</code></p>
+                    <div class="code-block" style="margin: 0.6rem 0;">
+                        corners = cv2.goodFeaturesToTrack(gray, maxCorners=50, qualityLevel=0.01, minDistance=10)<br>
+                        for pt in corners:<br>
+                        &nbsp;&nbsp; cv2.circle(img, tuple(pt[0]), 5, (0,255,0), -1)
+                    </div>
+                    <small>✔️ <strong>Practice:</strong> Detect corners in a chessboard image, observe how qualityLevel filters weak corners.</small>
+                </div>
+            </div>
+            <div class="highlight">
+                💡 <strong>Checkboard corner example:</strong> Load a chessboard photo → Shi-Tomasi finds inner corners perfectly. Essential for camera calibration!
+            </div>
+        </div>
+    </div>
+
+    <!-- KEYPOINT DETECTORS: SIFT vs ORB detailed -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔑 Keypoint Detectors: SIFT & ORB</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🧬 SIFT (Scale-Invariant Feature Transform)</span>
+                    <p>Patented but now freely available. Robust to scale, rotation, affine changes. Computes 128-dim descriptors.</p>
+                    <div class="code-block">
+                        sift = cv2.SIFT_create()<br>
+                        kp, des = sift.detectAndCompute(gray, None)<br>
+                        # kp = keypoints, des = descriptor array
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">⚡ ORB (Oriented FAST + Rotated BRIEF)</span>
+                    <p>Efficient, free, and fast. Great for real-time applications. Rotation invariant, binary descriptors.</p>
+                    <div class="code-block">
+                        orb = cv2.ORB_create(nfeatures=1000)<br>
+                        kp, des = orb.detectAndCompute(gray, None)<br>
+                        img_kp = cv2.drawKeypoints(img, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>When to use?</strong> ORB → real-time, mobile/embedded (panorama stitching, SLAM). SIFT → higher accuracy, varying scales/rotation (photogrammetry, medical).
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURE MATCHING: BFMatcher & FLANN with example code -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔗 Feature Matching: BFMatcher & FLANN</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>BFMatcher (Brute Force)</strong> – compares every descriptor from image1 with all in image2. <strong>FLANN</strong> – approximate nearest neighbor, faster for large datasets.</p>
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">💥 BFMatcher + knnMatch</span>
+                    <div class="code-block">
+                        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)<br>
+                        matches = bf.knnMatch(des1, des2, k=2)<br>
+                        # Lowe's ratio test to filter good matches<br>
+                        good = [m for m,n in matches if m.distance < 0.75*n.distance]
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🏎️ FLANN based Matcher</span>
+                    <div class="code-block">
+                        FLANN_INDEX_KDTREE = 1<br>
+                        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)<br>
+                        flann = cv2.FlannBasedMatcher(index_params, {})<br>
+                        matches = flann.knnMatch(des1, des2, k=2)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🎯 <strong>Practice: Match keypoints between two similar images (e.g., same building from different angles)</strong><br>
+                Steps: detect ORB → compute descriptors → BFMatcher → drawMatches. Observe inliers/outliers.
+            </div>
+            <div class="code-block">
+                # Complete matching example<br>
+                img1 = cv2.imread('building_left.jpg',0); img2 = cv2.imread('building_right.jpg',0)<br>
+                orb = cv2.ORB_create()<br>
+                kp1, des1 = orb.detectAndCompute(img1, None)<br>
+                kp2, des2 = orb.detectAndCompute(img2, None)<br>
+                bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)<br>
+                matches = bf.match(des1, des2)<br>
+                matched_img = cv2.drawMatches(img1, kp1, img2, kp2, matches[:30], None, flags=2)
+            </div>
+        </div>
+    </div>
+
+    <!-- MINI PROJECT: PANORAMA STITCHER with ORB + Homography -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🌄 Mini Project: Panorama Stitcher (ORB + Homography)</h2>
+        </div>
+        <div class="card-body">
+            <div class="project-pipeline">
+                <span style="font-weight:800; font-size:1.2rem;">📸 Stitch two overlapping images into a seamless panorama</span>
+                <p style="margin: 0.6rem 0 1rem 0;">Pipeline: detect ORB keypoints → match features → compute Homography (perspective transform) → warp image → blend.</p>
+                <div class="code-block" style="background:#0b1c24; margin-bottom: 1rem;">
+                    import cv2<br>
+                    import numpy as np<br><br>
+                    def stitch_images(img_left, img_right):<br>
+                    &nbsp;&nbsp;  # 1. Convert to grayscale, detect ORB<br>
+                    &nbsp;&nbsp;  gray1 = cv2.cvtColor(img_left, cv2.COLOR_BGR2GRAY)<br>
+                    &nbsp;&nbsp;  gray2 = cv2.cvtColor(img_right, cv2.COLOR_BGR2GRAY)<br>
+                    &nbsp;&nbsp;  orb = cv2.ORB_create(nfeatures=2000)<br>
+                    &nbsp;&nbsp;  kp1, des1 = orb.detectAndCompute(gray1, None)<br>
+                    &nbsp;&nbsp;  kp2, des2 = orb.detectAndCompute(gray2, None)<br>
+                    <br>
+                    &nbsp;&nbsp;  # 2. BFMatcher + Lowe's ratio test<br>
+                    &nbsp;&nbsp;  bf = cv2.BFMatcher(cv2.NORM_HAMMING)<br>
+                    &nbsp;&nbsp;  matches = bf.knnMatch(des1, des2, k=2)<br>
+                    &nbsp;&nbsp;  good_matches = []<br>
+                    &nbsp;&nbsp;  for m, n in matches:<br>
+                    &nbsp;&nbsp; &nbsp;&nbsp;   if m.distance < 0.75 * n.distance:<br>
+                    &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;     good_matches.append(m)<br>
+                    <br>
+                    &nbsp;&nbsp;  # 3. Find Homography (need at least 4 matches)<br>
+                    &nbsp;&nbsp;  src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1,1,2)<br>
+                    &nbsp;&nbsp;  dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1,1,2)<br>
+                    &nbsp;&nbsp;  H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)<br>
+                    <br>
+                    &nbsp;&nbsp;  # 4. Warp left image to right image's plane<br>
+                    &nbsp;&nbsp;  h, w = img_right.shape[:2]<br>
+                    &nbsp;&nbsp;  panorama = cv2.warpPerspective(img_left, H, (w + img_left.shape[1], h))<br>
+                    &nbsp;&nbsp;  panorama[0:h, 0:w] = img_right  # simple blend<br>
+                    &nbsp;&nbsp;  return panorama<br>
+                    <br>
+                    # usage<br>
+                    left = cv2.imread('left_view.jpg')<br>
+                    right = cv2.imread('right_view.jpg')<br>
+                    result = stitch_images(left, right)<br>
+                    cv2.imwrite('panorama_result.jpg', result)
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.8rem;">
+                    <div style="background:#2b5568; border-radius:1rem; padding:0.6rem 1rem; flex:1;">
+                        ✅ <strong>Expected outcome</strong><br> Two overlapping photos (30-50% overlap) combined into wide panoramic view.
+                    </div>
+                    <div style="background:#2b5568; border-radius:1rem; padding:0.6rem 1rem; flex:1;">
+                        🧪 <strong>Test it:</strong> Take photos of your room or landscape. ORB + RANSAC removes mismatched points.
+                    </div>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 1.2rem;">
+                📐 <strong>Why Homography?</strong> It maps points from one image plane to another, perfect for stitching when camera rotates around its optical center.
+                <br>⚡ <strong>Pro tip:</strong> If stitching fails, increase nfeatures or adjust Lowe's ratio threshold (0.7–0.8).
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Recap + additional tasks -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧪 Practice & Exercises Recap</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🏁 1. Detect corners in a checkerboard</span>
+                    <p>Use <code>cv2.goodFeaturesToTrack</code> on a chessboard image. Visualize corners with circles. Vary maxCorners and qualityLevel.</p>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🖼️ 2. Match keypoints between two similar images</span>
+                    <p>Take two photos of the same object with translation/rotation. Extract ORB, BFMatcher, draw top 20 matches. See how correct correspondences survive.</p>
+                </div>
+            </div>
+            <div class="code-block">
+                # BONUS: Visualize homography with inlier matches<br>
+                matchesMask = mask.ravel().tolist()<br>
+                draw_params = dict(matchColor=(0,255,0), singlePointColor=None, matchesMask=matchesMask, flags=2)<br>
+                img_matches = cv2.drawMatches(img_left, kp1, img_right, kp2, good_matches, None, **draw_params)
+            </div>
+            <div class="highlight">
+                🧠 <strong>Where to go next?</strong> After mastering stitching, you can build video stabilization, object tracking, or even a 360° panorama assembly.
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary: Cheatsheet -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 Quick Reference & Best Practices</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>🔹 <strong>Harris/Shi-Tomasi:</strong> Fast corner detection — use for tracking, not robust to large scale changes.</li>
+                <li>🔹 <strong>SIFT</strong> → patented but extremely robust; <strong>ORB</strong> → free, fast, good for real-time.</li>
+                <li>🔹 <strong>Matching ratio test (Lowe's):</strong> Keep matches where nearest neighbor distance << second nearest.</li>
+                <li>🔹 <strong>RANSAC + Homography:</strong> Essential to filter outliers before warping for panoramas.</li>
+                <li>🔹 Always ensure > 10–20 good matches for stable homography.</li>
+            </ul>
+            <hr>
+            <p style="margin-top: 0.5rem; text-align: center;">✨ Day 3 complete — you now hold the core of image alignment! Tomorrow: Deep Learning for Vision (CNNs).</p>
+        </div>
+    </div>
+
+    <footer>
+        🧩 Day 3: Feature detection is the "eye" of computer vision. From corners to panoramas — build systems that see correspondences.<br>
+        📂 Full code examples ready to copy & run with your own images.
+    </footer>
+</div>
+<script>
+    (function() {
+        console.log("%c🔍 Day 3: Feature Detection & Matching — Ready to stitch panoramas!", "color:#1a6b7c; font-weight:bold; font-size:13px");
+        console.log("%c💡 Try: ORB + BFMatcher + Homography = Panorama magic", "background:#eef2f5; color:#d65c2a; padding:2px 6px; border-radius:8px;");
+    })();
+</script>
+</body>
+</html>
