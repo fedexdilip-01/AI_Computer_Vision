@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 6: Image Segmentation & Face Recognition | Face Swapper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f8;
+            font-family: 'Inter', sans-serif;
+            color: #0a2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* hero header */
+        .hero {
+            background: linear-gradient(135deg, #2c1e4a 0%, #4a2c6e 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.25);
+        }
+        .badge-day {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.92;
+            max-width: 80%;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+        }
+        .card-header {
+            padding: 1.4rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #4a2c6e;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.6rem 2rem 2rem 2rem;
+        }
+
+        /* insight grid */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .insight-card {
+            background: #fafeff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-left: 5px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .insight-card.what { border-left-color: #2c7da0; }
+        .insight-card.why { border-left-color: #f4a261; }
+        .insight-card.how { border-left-color: #2a9d8f; }
+        .insight-card.where { border-left-color: #e76f51; }
+        .insight-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0f212e;
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #f4a261;
+        }
+
+        .two-col-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .demo-card {
+            flex: 1;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #e2e9f0;
+        }
+        .tag {
+            background: #e5f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: #fff7eb;
+            border-left: 5px solid #f4a261;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .project-workflow {
+            background: linear-gradient(145deg, #2e2350, #1e1638);
+            border-radius: 1.6rem;
+            padding: 1.5rem;
+            color: #f0f6fa;
+            margin-top: 1rem;
+        }
+        .workflow-step {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            align-items: flex-start;
+        }
+        .step-badge {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mock-image-placeholder {
+            background: #3a2a5a;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            font-family: monospace;
+            margin: 1rem 0;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: #cde0ea;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #cde0ea;
+        }
+        .segmentation-visual {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .seg-box {
+            background: #eef2fa;
+            border-radius: 1rem;
+            padding: 0.6rem;
+            text-align: center;
+            flex: 1;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .card-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <span class="badge-day">🎭 DAY 6 · IMAGE SEGMENTATION & FACE RECOGNITION</span>
+        <h1>Semantic Segmentation, Face Detection & Face Swapping</h1>
+        <div class="hero-sub">Pixel‑wise classification, face detection with Haar Cascades/MTCNN, and advanced face swapping using landmarks.</div>
+    </div>
+
+    <!-- WHAT / WHY / HOW / WHERE of Segmentation -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 Image Segmentation: What, Why, How, Where</h2>
+        </div>
+        <div class="card-body">
+            <div class="insight-grid">
+                <div class="insight-card what">
+                    <div class="insight-title">❓ WHAT is Segmentation?</div>
+                    <p><strong>Semantic:</strong> Classify each pixel (e.g., road, sky, person). <strong>Instance:</strong> Separate individual objects (person1, person2, car1). Output = mask overlay.</p>
+                    <div class="seg-box" style="background:#e0e7ff;">🖼️ Original → 🎨 Mask (pink=person, blue=sky)</div>
+                </div>
+                <div class="insight-card why">
+                    <div class="insight-title">🎯 WHY Segmentation?</div>
+                    <p>Autonomous driving (road/lane detection), medical imaging (tumor segmentation), background removal, photo editing, robotics scene understanding.</p>
+                </div>
+                <div class="insight-card how">
+                    <div class="insight-title">⚙️ HOW: UNet & Mask R-CNN</div>
+                    <p><strong>UNet:</strong> Encoder-decoder with skip connections — great for biomedical segmentation. <strong>Mask R-CNN:</strong> Extends Faster R-CNN with pixel-level masks.</p>
+                </div>
+                <div class="insight-card where">
+                    <div class="insight-title">🌍 WHERE applied?</div>
+                    <p>Satellite imagery, self-driving cars, virtual backgrounds (Zoom/Teams), AI photo editing, crop disease detection.</p>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Key difference:</strong> Detection = bounding boxes. Segmentation = pixel‑perfect boundaries. Mask R‑CNN does both!
+            </div>
+        </div>
+    </div>
+
+    <!-- Semantic vs Instance Segmentation Visual -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🖍️ Semantic vs Instance Segmentation</h2>
+        </div>
+        <div class="card-body">
+            <div class="segmentation-visual">
+                <div class="seg-box">
+                    <strong>🎨 Semantic Segmentation</strong><br>
+                    All "cars" → same color mask<br>
+                    [🟦 sky] [🟩 grass] [🟥 car]
+                </div>
+                <div class="seg-box">
+                    <strong>👥 Instance Segmentation</strong><br>
+                    Car A → mask 1, Car B → mask 2<br>
+                    Differentiates individual objects
+                </div>
+            </div>
+            <div class="code-block">
+                # Using a pre-trained segmentation model (Detectron2 / torchvision)<br>
+                import torchvision<br>
+                model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)<br>
+                model.eval()<br>
+                predictions = model(image_tensor)  # boxes, masks, labels
+            </div>
+        </div>
+    </div>
+
+    <!-- Face Detection: Haar Cascades vs MTCNN -->
+    <div class="card">
+        <div class="card-header">
+            <h2>👤 Face Detection: Haar Cascades & MTCNN</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📐 Haar Cascades (OpenCV)</span>
+                    <p>Classic, fast, CPU-friendly. Uses cascaded features. Works well for frontal faces. Limited with angles/occlusions.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')<br>
+                        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🧠 MTCNN (Multi-task CNN)</span>
+                    <p>Deep learning based. More accurate, handles profile faces, lighting variations. Returns bounding boxes + facial landmarks (eyes, nose, mouth).</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        from mtcnn import MTCNN<br>
+                        detector = MTCNN()<br>
+                        faces = detector.detect_faces(img)<br>
+                        # each face: box, keypoints (left_eye, right_eye, nose, mouth_left, mouth_right)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                💡 <strong>Practice:</strong> Detect faces in a group photo with both methods. MTCNN handles side profiles better, Haar is faster for real-time on CPU.
+            </div>
+        </div>
+    </div>
+
+    <!-- Face Recognition: face_recognition & DeepFace -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔍 Face Recognition: Who is this person?</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📦 face_recognition library</span>
+                    <p>Simple API, built on dlib. Face encoding (128-dim vector) → compare encodings to identify known faces.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        import face_recognition<br>
+                        image = face_recognition.load_image_file("person.jpg")<br>
+                        encoding = face_recognition.face_encodings(image)[0]<br>
+                        matches = face_recognition.compare_faces(known_encodings, encoding)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🧠 DeepFace</span>
+                    <p>Wrapper for state-of-the-art models (VGGFace, FaceNet, ArcFace). Handles verification, recognition, and attribute analysis (age, gender, emotion).</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        from deepface import DeepFace<br>
+                        result = DeepFace.verify(img1_path, img2_path)  # True/False<br>
+                        embedding = DeepFace.represent(img_path, model_name='Facenet')[0]["embedding"]
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Practice:</strong> Detect and blur faces in an image (privacy filter). Steps: detect faces → draw rectangle → apply Gaussian blur to ROI.
+            </div>
+            <div class="code-block">
+                # Face blurring with OpenCV + Haar cascade<br>
+                for (x, y, w, h) in faces:<br>
+                    face_roi = img[y:y+h, x:x+w]<br>
+                    blurred_face = cv2.GaussianBlur(face_roi, (99,99), 30)<br>
+                    img[y:y+h, x:x+w] = blurred_face
+            </div>
+        </div>
+    </div>
+
+    <!-- MINI PROJECT: Face Swapper - Full Workflow -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔄 Mini Project: Face Swapper</h2>
+        </div>
+        <div class="card-body">
+            <div class="project-workflow">
+                <span style="font-weight:800; font-size:1.3rem;">🎭 Swap faces between two images using landmarks + alignment</span>
+                <p style="margin:0.6rem 0 0.8rem 0;">Goal: Take two faces (source & target) → detect facial landmarks → align source face to target orientation → seamless blend.</p>
+                
+                <hr style="background:#5e4a8a; margin:0.8rem 0;">
+
+                <div class="workflow-step">
+                    <div class="step-badge">1</div>
+                    <div><strong>Detect faces & landmarks</strong> – Use dlib or MTCNN to get 68 facial landmarks (eyes, nose, jawline).</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">2</div>
+                    <div><strong>Compute convex hull & Delaunay triangulation</strong> – Create triangle mesh covering the face region.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">3</div>
+                    <div><strong>Warp triangles (affine transform)</strong> – Transform each triangle from source to target face geometry.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">4</div>
+                    <div><strong>Seamless cloning (color correction & blending)</strong> – Use OpenCV's seamlessClone to blend edges, match skin tone.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">5</div>
+                    <div><strong>Output swapped image</strong> – Source face now on target's head!</div>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    # Face Swapper using dlib + OpenCV (simplified pipeline)<br>
+                    import cv2, dlib, numpy as np<br>
+                    <br>
+                    detector = dlib.get_frontal_face_detector()<br>
+                    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")<br>
+                    <br>
+                    def get_landmarks(img):<br>
+                        faces = detector(img, 1)<br>
+                        if len(faces) == 0: return None<br>
+                        return np.array([[p.x, p.y] for p in predictor(img, faces[0]).parts()])<br>
+                    <br>
+                    def face_swap(source_img, target_img):<br>
+                        src_pts = get_landmarks(source_img)<br>
+                        tgt_pts = get_landmarks(target_img)<br>
+                        if src_pts is None or tgt_pts is None: return target_img<br>
+                        <br>
+                        # Compute convex hull and triangulation<br>
+                        hull_src = cv2.convexHull(src_pts)<br>
+                        hull_tgt = cv2.convexHull(tgt_pts)<br>
+                        <br>
+                        # Warp source face to target geometry<br>
+                        warped_face = warp_triangles(source_img, src_pts, tgt_pts, hull_src, hull_tgt)<br>
+                        <br>
+                        # Create mask and seamless clone<br>
+                        mask = np.zeros(target_img.shape[:2], dtype=np.uint8)<br>
+                        cv2.fillConvexPoly(mask, hull_tgt, 255)<br>
+                        output = cv2.seamlessClone(warped_face, target_img, mask, (tgt_pts[30][0], tgt_pts[30][1]), cv2.NORMAL_CLONE)<br>
+                        return output<br>
+                    <br>
+                    # Usage:<br>
+                    source = cv2.imread("face_a.jpg")<br>
+                    target = cv2.imread("face_b.jpg")<br>
+                    swapped = face_swap(source, target)<br>
+                    cv2.imwrite("face_swapped.jpg", swapped)
+                </div>
+
+                <div class="mock-image-placeholder" style="margin-top: 1rem;">
+                    🎭 [SOURCE FACE] + [TARGET HEAD] → 🔄 Landmark alignment → ✨ Swapped face result
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 1.2rem;">
+                🧪 <strong>Try it yourself:</strong> Use two portrait photos (front-facing works best). The landmark-based warping preserves expression and orientation.
+                <br>⚡ <strong>Pro tip:</strong> For better skin blending, apply color correction (histogram matching) before seamlessClone.
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice: Segment foreground/background -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🎨 Practice: Foreground/Background Segmentation</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🖌️ Using pre-trained model (Mask R-CNN)</span>
+                    <div class="code-block">
+                        model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)<br>
+                        pred = model([img_tensor])[0]<br>
+                        # person class mask extraction<br>
+                        person_mask = (pred['masks'][0,0] > 0.5).cpu().numpy()<br>
+                        foreground = img * person_mask[:,:,np.newaxis]
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🌅 Background removal (rembg)</span>
+                    <div class="code-block">
+                        from rembg import remove<br>
+                        output = remove(input_image)  # automatic person/object removal
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🎯 <strong>Expected output:</strong> Isolated foreground with transparent background — perfect for photo editing and virtual backgrounds.
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheatsheet & Best Practices -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 Best Practices for Segmentation & Face Recognition</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>🔹 <strong>For face detection:</strong> MTCNN is more robust (angles/lighting), Haar is faster for real-time CPU apps.</li>
+                <li>🔹 <strong>Face recognition accuracy:</strong> DeepFace (Facenet/ArcFace) > face_recognition. Choose based on required precision.</li>
+                <li>🔹 <strong>Segmentation models:</strong> UNet for medical/binary masks, Mask R-CNN for instance segmentation (80 COCO classes).</li>
+                <li>🔹 <strong>Face swapping:</strong> Always align landmarks and use seamless cloning for realistic skin blending.</li>
+                <li>🔹 <strong>Privacy:</strong> Face blurring is essential for public CCTV/datasets compliance (GDPR).</li>
+            </ul>
+            <hr>
+            <div style="background: #eef3fc; border-radius: 1rem; padding: 1rem; text-align: center; margin-top: 0.8rem;">
+                🚀 <strong>Next step (Day 7):</strong> End-to-End Project & Deployment — build a complete vision app and deploy with Streamlit/Flask!
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        🎭 Day 6 complete — You've mastered pixel-level segmentation, face detection, recognition, and even face swapping! These techniques power Snapchat filters, medical imaging, and autonomous driving.<br>
+        📸 Try the Face Swapper with your own photos for a fun demo.
+    </footer>
+</div>
+<script>
+    (function(){
+        console.log("%c🎭 Day 6: Image Segmentation & Face Recognition — Face Swapper Ready!", "color:#4a2c6e; font-weight:bold; font-size:13px");
+        console.log("%c💡 Pro tip: Use MTCNN for landmark detection (more accurate than dlib for profile faces).", "background:#eef2f5; color:#d65c2a; padding:2px 6px; border-radius:8px;");
+    })();
+</script>
+</body>
+</html>

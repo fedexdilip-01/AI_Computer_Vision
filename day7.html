@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 7: End-to-End Project + Deployment | AI Vision Finale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: 'Inter', sans-serif;
+            color: #0a2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* hero header */
+        .hero {
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c4a6e 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.25);
+        }
+        .badge-day {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.92;
+            max-width: 80%;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+        }
+        .card-header {
+            padding: 1.4rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #2c4a6e;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.6rem 2rem 2rem 2rem;
+        }
+
+        /* insight grid */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .insight-card {
+            background: #fafeff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-left: 5px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .insight-card.what { border-left-color: #2c7da0; }
+        .insight-card.why { border-left-color: #f4a261; }
+        .insight-card.how { border-left-color: #2a9d8f; }
+        .insight-card.where { border-left-color: #e76f51; }
+        .insight-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0f212e;
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #f4a261;
+        }
+
+        .three-col-projects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .project-card {
+            flex: 1;
+            min-width: 280px;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            border: 2px solid #e2e9f0;
+            transition: all 0.2s;
+        }
+        .project-card:hover {
+            border-color: #f4a261;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .project-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .tag {
+            background: #e5f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .highlight {
+            background: #fff7eb;
+            border-left: 5px solid #f4a261;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+        .workflow-step {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            align-items: flex-start;
+        }
+        .step-badge {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: #cde0ea;
+        }
+        .deployment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .deploy-card {
+            background: #eef3fc;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #cde0ea;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .card-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <span class="badge-day">🚀 DAY 7 · END-TO-END PROJECT + DEPLOYMENT</span>
+        <h1>Model Optimization, Deployment & Final Projects</h1>
+        <div class="hero-sub">From training to production — quantize models, build web APIs, deploy on edge, and complete your capstone project.</div>
+    </div>
+
+    <!-- WHAT / WHY / HOW / WHERE of Model Deployment -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 Model Deployment: What, Why, How, Where</h2>
+        </div>
+        <div class="card-body">
+            <div class="insight-grid">
+                <div class="insight-card what">
+                    <div class="insight-title">❓ WHAT is Model Deployment?</div>
+                    <p>Taking a trained model and integrating it into a production environment — web app, mobile app, edge device, or cloud API. Making predictions available to end users.</p>
+                </div>
+                <div class="insight-card why">
+                    <div class="insight-title">🎯 WHY Optimize & Deploy?</div>
+                    <p>Models are too large/slow for real-time use. Quantization reduces size (4-8x) with minimal accuracy loss. Deployment brings AI to users — real impact!</p>
+                </div>
+                <div class="insight-card how">
+                    <div class="insight-title">⚙️ HOW: Optimization + API</div>
+                    <p><strong>Quantization:</strong> INT8 vs FP32. <strong>Pruning:</strong> Remove unnecessary weights. <strong>Flask/FastAPI:</strong> REST APIs. <strong>Streamlit:</strong> Interactive dashboards.</p>
+                </div>
+                <div class="insight-card where">
+                    <div class="insight-title">🌍 WHERE Deployed?</div>
+                    <p>Web apps (AWS/GCP), mobile (TensorFlow Lite), edge (Raspberry Pi, Jetson), browser (TensorFlow.js), IoT cameras.</p>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Key insight:</strong> A perfect model in Jupyter is useless if it can't run in production. Deployment is the final bridge to real-world value.
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Optimization: Quantization & Pruning -->
+    <div class="card">
+        <div class="card-header">
+            <h2>⚡ Model Optimization: Quantization & Pruning</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div class="demo-card" style="flex:1;">
+                    <span class="tag">📉 Quantization (PyTorch)</span>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        import torch<br>
+                        model.eval()<br>
+                        quantized_model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)<br>
+                        # 75% smaller, minimal accuracy drop
+                    </div>
+                </div>
+                <div class="demo-card" style="flex:1;">
+                    <span class="tag">✂️ Pruning (Remove redundant weights)</span>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        import torch.nn.utils.prune as prune<br>
+                        prune.l1_unstructured(module, name='weight', amount=0.3)<br>
+                        # Remove 30% of smallest weights → sparsity
+                    </div>
+                </div>
+                <div class="demo-card" style="flex:1;">
+                    <span class="tag">📱 TensorFlow Lite</span>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        converter = tf.lite.TFLiteConverter.from_saved_model(model_path)<br>
+                        converter.optimizations = [tf.lite.Optimize.DEFAULT]<br>
+                        tflite_model = converter.convert()
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                📊 <strong>Results:</strong> ResNet50: 98MB → 25MB (quantized). Speed increase 2-3x on CPU. Perfect for edge deployment.
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Options: Flask, FastAPI, Streamlit -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🌐 Deployment Frameworks: Flask, FastAPI, Streamlit</h2>
+        </div>
+        <div class="card-body">
+            <div class="deployment-grid">
+                <div class="deploy-card">
+                    <strong>🐍 Flask</strong><br>
+                    Lightweight, flexible<br>
+                    <code style="font-size:0.7rem;">POST /predict</code>
+                </div>
+                <div class="deploy-card">
+                    <strong>⚡ FastAPI</strong><br>
+                    High performance, async, auto-docs<br>
+                    <code style="font-size:0.7rem;">async def predict()</code>
+                </div>
+                <div class="deploy-card">
+                    <strong>📊 Streamlit</strong><br>
+                    No HTML/CSS needed, interactive widgets<br>
+                    <code style="font-size:0.7rem;">st.image(), st.button()</code>
+                </div>
+            </div>
+            <div class="code-block">
+                # Flask API for YOLO object detection<br>
+                from flask import Flask, request, jsonify<br>
+                from ultralytics import YOLO<br>
+                <br>
+                app = Flask(__name__)<br>
+                model = YOLO('yolov8n.pt')<br>
+                <br>
+                @app.route('/detect', methods=['POST'])<br>
+                def detect():<br>
+                    image = request.files['image'].read()<br>
+                    results = model(image)<br>
+                    return jsonify(results[0].boxes.data.tolist())<br>
+                <br>
+                if __name__ == '__main__':<br>
+                    app.run(host='0.0.0.0', port=5000)
+            </div>
+            <div class="code-block" style="margin-top: 0.5rem;">
+                # Streamlit interactive app<br>
+                import streamlit as st<br>
+                from PIL import Image<br>
+                <br>
+                st.title("AI Vision Classifier")<br>
+                uploaded = st.file_uploader("Upload an image")<br>
+                if uploaded:<br>
+                    img = Image.open(uploaded)<br>
+                    st.image(img)<br>
+                    # run model inference<br>
+                    st.write("Prediction: Cat (92%)")
+            </div>
+        </div>
+    </div>
+
+    <!-- Edge Deployment: TensorFlow Lite & ONNX -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📱 Edge Deployment: TensorFlow Lite & ONNX</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🤖 TensorFlow Lite</span>
+                    <p>Run models on mobile (Android/iOS), Raspberry Pi, microcontrollers. Convert → TFLite → delegate GPU/Edge TPU.</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        interpreter = tf.lite.Interpreter(model_path="model.tflite")<br>
+                        interpreter.allocate_tensors()<br>
+                        interpreter.set_tensor(input_index, input_data)<br>
+                        interpreter.invoke()
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🔄 ONNX (Open Neural Network Exchange)</span>
+                    <p>Framework-agnostic. Convert PyTorch/TF → ONNX → deploy anywhere (ONNX Runtime speeds up inference 2-3x).</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        import onnx<br>
+                        import onnxruntime as ort<br>
+                        session = ort.InferenceSession("model.onnx")<br>
+                        output = session.run(None, {"input": input_numpy})
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🌟 <strong>Edge devices:</strong> Raspberry Pi 4 (YOLOv5s ~5 FPS), Google Coral (Edge TPU ~100 FPS), NVIDIA Jetson Nano.
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL PROJECTS - Three Options with Workflows -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🎯 Final Projects (Choose One)</h2>
+        </div>
+        <div class="card-body">
+            <div class="three-col-projects">
+                <!-- Option A: Defect Detection -->
+                <div class="project-card">
+                    <div class="project-icon">🏭</div>
+                    <span class="tag">Option A · Manufacturing</span>
+                    <h3 style="margin: 0.5rem 0;">Defect Detection</h3>
+                    <p>Custom dataset + YOLO to detect scratches, dents, or missing components on production line.</p>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">1</div>
+                        <small>Collect 500+ defect/normal images</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">2</div>
+                        <small>Label with Roboflow/CVAT</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">3</div>
+                        <small>Fine-tune YOLOv8 on custom dataset</small>
+                    </div>
+                    <div class="code-block" style="font-size:0.7rem; margin-top:0.5rem;">
+                        # Train YOLO on custom defect dataset<br>
+                        from ultralytics import YOLO<br>
+                        model = YOLO('yolov8n.pt')<br>
+                        model.train(data='defect.yaml', epochs=50, imgsz=640)
+                    </div>
+                </div>
+
+                <!-- Option B: Hand Gesture Controller -->
+                <div class="project-card">
+                    <div class="project-icon">✋</div>
+                    <span class="tag">Option B · HCI</span>
+                    <h3 style="margin: 0.5rem 0;">Hand Gesture Controller</h3>
+                    <p>Track hand landmarks → control volume, mouse cursor, or presentation slides.</p>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">1</div>
+                        <small>MediaPipe Hands for landmark detection</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">2</div>
+                        <small>Calculate finger states (up/down) via landmark angles</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">3</div>
+                        <small>Map gestures → system actions (pyautogui, pycaw)</small>
+                    </div>
+                    <div class="code-block" style="font-size:0.7rem; margin-top:0.5rem;">
+                        # Hand gesture volume control<br>
+                        import mediapipe as mp<br>
+                        hands = mp.solutions.hands.Hands()<br>
+                        # thumb-tip to index-tip distance → volume level
+                    </div>
+                </div>
+
+                <!-- Option C: Traffic Sign Recognizer -->
+                <div class="project-card">
+                    <div class="project-icon">🚦</div>
+                    <span class="tag">Option C · Autonomous Driving</span>
+                    <h3 style="margin: 0.5rem 0;">Traffic Sign Recognizer</h3>
+                    <p>Train CNN on GTSRB dataset (43 traffic sign classes). Deploy as web app.</p>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">1</div>
+                        <small>Download GTSRB dataset (50k+ images)</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">2</div>
+                        <small>Build CNN (Conv+Pool+FC) or fine-tune ResNet18</small>
+                    </div>
+                    <div class="workflow-step" style="margin: 0.5rem 0;">
+                        <div class="step-badge" style="width:24px; height:24px; font-size:0.7rem;">3</div>
+                        <small>Achieve 95%+ accuracy → deploy with Streamlit</small>
+                    </div>
+                    <div class="code-block" style="font-size:0.7rem; margin-top:0.5rem;">
+                        # PyTorch CNN for traffic signs<br>
+                        class TrafficCNN(nn.Module):<br>
+                        &nbsp;&nbsp; def __init__(self):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp; self.conv1 = nn.Conv2d(3, 32, 3)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp; self.fc1 = nn.Linear(32*30*30, 43)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Deployment Workflow for any project -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📦 End-to-End Deployment Workflow</h2>
+        </div>
+        <div class="card-body">
+            <div class="project-workflow" style="background: linear-gradient(145deg, #1a2a3a, #0f1e2a); border-radius: 1.6rem; padding: 1.5rem; color: white;">
+                <span style="font-weight:800; font-size:1.2rem;">🔁 From Training to Production (7 Steps)</span>
+                
+                <div class="workflow-step">
+                    <div class="step-badge">1</div>
+                    <div><strong>Train/Collect Model</strong> – YOLO defect detector, hand gesture classifier, or traffic sign CNN.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">2</div>
+                    <div><strong>Optimize</strong> – Quantize to INT8 (PyTorch/TensorFlow Lite), prune if needed.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">3</div>
+                    <div><strong>Export</strong> – Save as .pt, .onnx, or .tflite format.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">4</div>
+                    <div><strong>Build API</strong> – Create Flask/FastAPI endpoint that loads model and returns predictions.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">5</div>
+                    <div><strong>Create UI</strong> – Streamlit dashboard (upload image, show results) or React frontend.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">6</div>
+                    <div><strong>Containerize (Optional)</strong> – Docker + Dockerfile for reproducible deployment.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">7</div>
+                    <div><strong>Deploy to Cloud</strong> – Hugging Face Spaces (free), Render, AWS EC2, or Google Cloud Run.</div>
+                </div>
+
+                <div class="code-block" style="background:#0d1c24; margin-top: 1rem;">
+                    # Dockerfile for Streamlit App<br>
+                    FROM python:3.9-slim<br>
+                    WORKDIR /app<br>
+                    COPY requirements.txt .<br>
+                    RUN pip install -r requirements.txt<br>
+                    COPY . .<br>
+                    CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Example: Defect Detection Deployment -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🔧 Complete Example: Defect Detection Web App</h2>
+        </div>
+        <div class="card-body">
+            <div class="highlight">
+                📦 <strong>Full project structure:</strong>
+                <pre style="background:#f0f2f5; padding:0.8rem; border-radius:0.8rem; margin-top:0.5rem; font-size:0.75rem;">
+defect-detector/
+├── model/
+│   └── best.pt (trained YOLO)
+├── app.py (Streamlit UI)
+├── requirements.txt
+├── Dockerfile
+└── README.md
+                </pre>
+            </div>
+            <div class="code-block">
+                # app.py - Complete Streamlit Defect Detection App<br>
+                import streamlit as st<br>
+                from ultralytics import YOLO<br>
+                from PIL import Image<br>
+                import numpy as np<br>
+                <br>
+                st.set_page_config(page_title="Defect Detection", page_icon="🏭")<br>
+                st.title("🏭 Manufacturing Defect Detection")<br>
+                st.write("Upload a product image to detect defects (scratches, dents, missing parts)")<br>
+                <br>
+                @st.cache_resource<br>
+                def load_model():<br>
+                    return YOLO('model/best.pt')<br>
+                <br>
+                model = load_model()<br>
+                uploaded_file = st.file_uploader("Choose an image...", type=['jpg', 'png', 'jpeg'])<br>
+                <br>
+                if uploaded_file is not None:<br>
+                    image = Image.open(uploaded_file)<br>
+                    st.image(image, caption='Uploaded Image', use_container_width=True)<br>
+                    <br>
+                    if st.button('Detect Defects'):<br>
+                        with st.spinner('Analyzing...'):<br>
+                            results = model(np.array(image))<br>
+                            annotated = results[0].plot()<br>
+                            st.image(annotated, caption='Detection Result', use_container_width=True)<br>
+                            <br>
+                            defect_count = len(results[0].boxes)<br>
+                            if defect_count > 0:<br>
+                                st.error(f"⚠️ {defect_count} defects detected!")<br>
+                            else:<br>
+                                st.success("✅ No defects detected. Product OK.")<br>
+                <br>
+                st.markdown("---")<br>
+                st.markdown("🚀 Deployed with YOLOv8 + Streamlit")
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Selection Guide & Next Steps -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📋 Which Project Should You Choose?</h2>
+        </div>
+        <div class="card-body">
+            <div class="three-col-projects" style="gap: 1rem;">
+                <div class="demo-card">
+                    <strong>🏭 Defect Detection</strong><br>
+                    <em>Best for:</em> Industrial AI, manufacturing, internship portfolios.<br>
+                    <strong>Difficulty:</strong> Medium (need custom dataset labeling).<br>
+                    <strong>Impact:</strong> High — real business value.
+                </div>
+                <div class="demo-card">
+                    <strong>✋ Hand Gesture Controller</strong><br>
+                    <em>Best for:</em> HCI, real-time systems, fun demos.<br>
+                    <strong>Difficulty:</strong> Easy (MediaPipe handles detection).<br>
+                    <strong>Impact:</strong> Great for showcasing interactivity.
+                </div>
+                <div class="demo-card">
+                    <strong>🚦 Traffic Sign Recognizer</strong><br>
+                    <em>Best for:</em> Autonomous driving, academic projects.<br>
+                    <strong>Difficulty:</strong> Medium (training CNN from scratch).<br>
+                    <strong>Impact:</strong> Excellent for learning deep learning fundamentals.
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 1rem;">
+                🎓 <strong>After Day 7:</strong> Deploy your project to Hugging Face Spaces (free hosting) and share the link on LinkedIn/GitHub. You've completed the 7-Day AI Computer Vision Program!
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheatsheet -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 Deployment Best Practices</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>🔹 <strong>Always quantize</strong> before deploying to CPU/edge devices → 4x smaller, 2x faster.</li>
+                <li>🔹 <strong>Use caching</strong> (st.cache_resource in Streamlit) to load model once.</li>
+                <li>🔹 <strong>Set confidence thresholds</strong> appropriately (0.5 for general detection, 0.7 for high precision).</li>
+                <li>🔹 <strong>Environment variables</strong> for API keys when using cloud services.</li>
+                <li>🔹 <strong>Test with Docker locally</strong> before cloud deployment to avoid "works on my machine" issues.</li>
+                <li>🔹 <strong>Monitor model drift</strong> in production — retrain periodically with new data.</li>
+            </ul>
+            <hr>
+            <div style="background: #1a2a3a; border-radius: 1rem; padding: 1rem; text-align: center; color: white; margin-top: 0.8rem;">
+                🎉 <strong>Congratulations!</strong> You've completed all 7 days. You're now ready to build, optimize, and deploy real-world computer vision applications.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        🚀 Day 7 complete — From foundations to deployment. Choose your final project, build it, and share it with the world!<br>
+        📦 Recommended hosting: Hugging Face Spaces (free GPU), Streamlit Cloud, or Render.
+    </footer>
+</div>
+<script>
+    (function(){
+        console.log("%c🚀 Day 7: End-to-End Project + Deployment — Final Day!", "color:#2c4a6e; font-weight:bold; font-size:13px");
+        console.log("%c💡 Pro tip: Deploy your project to Hugging Face Spaces — free HTTPS hosting with GPU option!", "background:#eef2f5; color:#d65c2a; padding:2px 6px; border-radius:8px;");
+    })();
+</script>
+</body>
+</html>
