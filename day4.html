@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 4: Deep Learning for Vision | CNNs & Image Classifier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+            color: #0a2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* hero header */
+        .hero {
+            background: linear-gradient(135deg, #0f2c3f 0%, #1b4f6e 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.25);
+        }
+        .badge-day {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.92;
+            max-width: 80%;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+            transition: transform 0.2s;
+        }
+        .card-header {
+            padding: 1.4rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #146b87;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.6rem 2rem 2rem 2rem;
+        }
+
+        /* insight grid (what/why/how/where) */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .insight-card {
+            background: #fafeff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            border-left: 5px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .insight-card.what { border-left-color: #2c7da0; }
+        .insight-card.why { border-left-color: #f4a261; }
+        .insight-card.how { border-left-color: #2a9d8f; }
+        .insight-card.where { border-left-color: #e76f51; }
+        .insight-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: #0f212e;
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #f4a261;
+        }
+
+        .two-col-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .demo-card {
+            flex: 1;
+            background: #fefcf7;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #e2e9f0;
+        }
+        .tag {
+            background: #e5f0f7;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: #fff7eb;
+            border-left: 5px solid #f4a261;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* project workflow container */
+        .project-workflow {
+            background: linear-gradient(145deg, #1f3e48, #0e2d3a);
+            border-radius: 1.6rem;
+            padding: 1.5rem;
+            color: #f0f6fa;
+            margin-top: 1rem;
+        }
+        .workflow-step {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            align-items: flex-start;
+        }
+        .step-badge {
+            background: #f4a261;
+            color: #1e3b44;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: #d4e2ec;
+        }
+
+        .mock-image {
+            background: linear-gradient(145deg, #cfdee9, #b8cad8);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #1e4a6e;
+            margin: 0.5rem 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #cde0ea;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .card-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <span class="badge-day">🧠 DAY 4 · DEEP LEARNING FOR VISION</span>
+        <h1>CNNs, Pre-trained Models & Image Classifier</h1>
+        <div class="hero-sub">Why convolutions dominate vision — from theory to hands-on inference with ResNet18 and MobileNet. Build a real classifier for custom images.</div>
+    </div>
+
+    <!-- WHAT / WHY / HOW / WHERE of CNNs -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 Understanding CNNs: The "What, Why, How, Where"</h2>
+        </div>
+        <div class="card-body">
+            <div class="insight-grid">
+                <div class="insight-card what">
+                    <div class="insight-title">❓ WHAT are CNNs?</div>
+                    <p>Convolutional Neural Networks are deep learning architectures that automatically learn spatial hierarchies of features. Composed of <strong>convolutional layers, pooling layers, and fully-connected layers</strong>.</p>
+                    <div class="mock-image" style="margin-top:8px;">🧩 conv → ReLU → pool → conv → ReLU → pool → FC</div>
+                </div>
+                <div class="insight-card why">
+                    <div class="insight-title">🎯 WHY CNNs for Vision?</div>
+                    <p>Traditional ML needs manual features (HOG, SIFT). CNNs learn <strong>edges → textures → parts → objects</strong> automatically. Parameter sharing & translation invariance make them extremely efficient for images.</p>
+                </div>
+                <div class="insight-card how">
+                    <div class="insight-title">⚙️ HOW do they work?</div>
+                    <p>• <strong>Convolution:</strong> filters slide over image → feature maps.<br>
+                       • <strong>Pooling:</strong> downsamples (max/average) → reduces dimensions.<br>
+                       • <strong>Activation (ReLU):</strong> introduces non-linearity.<br>
+                       • Backpropagation learns filter weights.</p>
+                </div>
+                <div class="insight-card where">
+                    <div class="insight-title">🌍 WHERE used?</div>
+                    <p>Object detection (YOLO), segmentation (UNet), medical imaging, facial recognition, autonomous driving, image search, and any visual recognition task.</p>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Key intuition:</strong> Early layers detect edges/blobs, middle layers detect textures/patterns, deeper layers detect object parts (eyes, wheels). Pre-trained models already have these rich features!
+            </div>
+        </div>
+    </div>
+
+    <!-- Convolution, Pooling, Activation deep dive -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧬 Core Building Blocks: Conv + Pooling + Activation</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🟦 Convolution</span>
+                    <p>Filter (kernel) slides across input, computes dot product. Output = feature map. Learns spatial patterns.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        # conceptual: 3x3 kernel on 32x32 image<br>
+                        output = conv2d(input, kernel, stride=1, padding=0)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">📉 Pooling (MaxPool)</span>
+                    <p>Reduces spatial size, keeps dominant features. Common: 2x2 window with stride 2 → halves dimensions.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        # PyTorch: nn.MaxPool2d(kernel_size=2, stride=2)
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">⚡ Activation (ReLU)</span>
+                    <p>f(x) = max(0,x). Adds non-linearity, helps gradient flow. After every conv layer.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        x = torch.relu(conv_output)
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                💡 <strong>Why these three together?</strong> Conv extracts features → ReLU introduces non-linearity → Pooling reduces computation & overfitting. Stack them to create deep networks.
+            </div>
+        </div>
+    </div>
+
+    <!-- Pre-trained Models: ResNet & MobileNet -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🏋️ Loading Pre-trained Models (ResNet18, MobileNet)</h2>
+        </div>
+        <div class="card-body">
+            <p>Pre-trained models trained on ImageNet (1.2M images, 1000 classes). They act as powerful feature extractors. <strong>Transfer learning</strong> = reuse these weights for custom tasks.</p>
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🟢 ResNet18 (Residual Network)</span>
+                    <p>18 layers deep with skip connections (residual blocks). Solves vanishing gradient, high accuracy.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        import torchvision.models as models<br>
+                        resnet18 = models.resnet18(pretrained=True)<br>
+                        resnet18.eval()   # inference mode
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">📱 MobileNetV2 (Lightweight)</span>
+                    <p>Depthwise separable convolutions → efficient for mobile/edge. Good speed vs accuracy tradeoff.</p>
+                    <div class="code-block" style="margin:0.5rem 0;">
+                        mobilenet = models.mobilenet_v2(pretrained=True)<br>
+                        mobilenet.eval()
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🧪 <strong>Practice: Load ResNet18 and run inference on sample image</strong><br>
+                Steps: load image → transform (resize 224x224, normalize) → forward pass → get top-5 class predictions.
+            </div>
+            <div class="code-block">
+                # Full inference pipeline with torchvision<br>
+                from torchvision import transforms<br>
+                from PIL import Image<br>
+                import torch<br>
+                <br>
+                transform = transforms.Compose([<br>
+                &nbsp;&nbsp; transforms.Resize(256),<br>
+                &nbsp;&nbsp; transforms.CenterCrop(224),<br>
+                &nbsp;&nbsp; transforms.ToTensor(),<br>
+                &nbsp;&nbsp; transforms.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])<br>
+                ])<br>
+                img = Image.open('cat.jpg')<br>
+                input_tensor = transform(img).unsqueeze(0)<br>
+                with torch.no_grad():<br>
+                &nbsp;&nbsp; output = resnet18(input_tensor)<br>
+                probabilities = torch.nn.functional.softmax(output[0], dim=0)<br>
+                # map to ImageNet class labels → top 5 classes printed
+            </div>
+        </div>
+    </div>
+
+    <!-- MINI PROJECT: Image Classifier with MobileNet (detailed workflow) -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📸 Mini Project: Image Classifier with MobileNet</h2>
+        </div>
+        <div class="card-body">
+            <div class="project-workflow">
+                <span style="font-weight:800; font-size:1.3rem;">🎯 Classify 10 custom test images using MobileNet</span>
+                <p style="margin:0.6rem 0 0.8rem 0;">Goal: Take any 10 images (dog, coffee mug, car, etc.) → run through pre-trained MobileNet → display predicted labels & confidence scores.</p>
+
+                <hr style="background:#3e6e82; margin:0.8rem 0;">
+
+                <div class="workflow-step">
+                    <div class="step-badge">1</div>
+                    <div><strong>Setup environment</strong> – Install torch, torchvision, pillow. Load MobileNetV2 with pretrained=True.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">2</div>
+                    <div><strong>Prepare image transforms</strong> – Resize to 224x224, convert to tensor, normalize with ImageNet stats.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">3</div>
+                    <div><strong>Load ImageNet labels</strong> – 1000 class names (download JSON or use synset). Map output index → human readable label.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">4</div>
+                    <div><strong>Run inference</strong> – for each custom image, model.eval(), no_grad(), forward pass, softmax, get top-3 predictions.</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-badge">5</div>
+                    <div><strong>Display results</strong> – Show image + predicted class + confidence (e.g., "Persian cat: 92.3%").</div>
+                </div>
+                
+                <div class="code-block" style="margin-top: 1rem;">
+                    # Complete MobileNet classifier for custom images<br>
+                    import torch<br>
+                    import torchvision.models as models<br>
+                    import torchvision.transforms as transforms<br>
+                    from PIL import Image<br>
+                    import requests<br>
+                    import json<br>
+                    <br>
+                    # 1. load model<br>
+                    model = models.mobilenet_v2(pretrained=True)<br>
+                    model.eval()<br>
+                    <br>
+                    # 2. ImageNet labels (download mapping)<br>
+                    labels_url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"<br>
+                    classes = requests.get(labels_url).text.splitlines()<br>
+                    <br>
+                    # 3. preprocessing<br>
+                    preprocess = transforms.Compose([<br>
+                        transforms.Resize(256),<br>
+                        transforms.CenterCrop(224),<br>
+                        transforms.ToTensor(),<br>
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])<br>
+                    ])<br>
+                    <br>
+                    def classify_image(image_path):<br>
+                        img = Image.open(image_path).convert('RGB')<br>
+                        input_tensor = preprocess(img).unsqueeze(0)<br>
+                        with torch.no_grad():<br>
+                            output = model(input_tensor)<br>
+                        probs = torch.nn.functional.softmax(output[0], dim=0)<br>
+                        top3 = torch.topk(probs, 3)<br>
+                        results = [(classes[idx], probs[idx].item()) for idx in top3.indices]<br>
+                        return results<br>
+                    <br>
+                    # classify your 10 custom images<br>
+                    for img_path in ["dog.jpg", "coffee_mug.jpg", "bicycle.jpg", ...]:<br>
+                        predictions = classify_image(img_path)<br>
+                        print(f"{img_path}: {predictions[0][0]} ({predictions[0][1]*100:.1f}%)")
+                </div>
+
+                <div class="mock-image" style="background:#2b5568; color:#eef4ff; margin-top: 1rem;">
+                    🖼️ Example output: "test_dog.jpg → Siberian husky (87.4%) | malamute (5.2%) | wolf (2.1%)"
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 1.2rem;">
+                🧪 <strong>Try it with YOUR images:</strong> Take photos of your pet, phone, keyboard, fruit — see how well MobileNet generalizes. Experiment with different pre-trained models (ResNet18, EfficientNet) and compare accuracy.
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice recap: Load ResNet18 inference -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🧪 Hands-on Practice: Run Inference with ResNet18</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">📥 Load ResNet18</span>
+                    <div class="code-block" style="margin:0.4rem 0;">
+                        import torchvision.models as models<br>
+                        resnet = models.resnet18(pretrained=True)<br>
+                        resnet = resnet.eval()
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🖼️ Inference on 3 sample images</span>
+                    <div class="code-block" style="margin:0.4rem 0;">
+                        # using same transform as above<br>
+                        for image in sample_images:<br>
+                        &nbsp;&nbsp; pred_class = get_top1_prediction(image)<br>
+                        &nbsp;&nbsp; print(f"{image}: {pred_class}")
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                🔍 <strong>Expected insight:</strong> Pre-trained models recognize everyday objects (monitor, keyboard, cat, car) with surprising accuracy even without fine-tuning.
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison: PyTorch vs TensorFlow/Keras -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🛠️ Tools: PyTorch vs TensorFlow/Keras</h2>
+        </div>
+        <div class="card-body">
+            <div class="two-col-demo">
+                <div class="demo-card">
+                    <span class="tag">🔥 PyTorch (dynamic, research-friendly)</span>
+                    <p>Define-by-run, Pythonic, great debugging. Preferred for research & custom architectures.</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        model = models.resnet18(pretrained=True)<br>
+                        out = model(x)   # immediate execution
+                    </div>
+                </div>
+                <div class="demo-card">
+                    <span class="tag">🧠 TensorFlow/Keras (production, high-level)</span>
+                    <p>Sequential API, easy deployment, TF Serving. Keras makes prototyping fast.</p>
+                    <div class="code-block" style="margin:0.3rem 0;">
+                        from tensorflow.keras.applications import MobileNetV2<br>
+                        model = MobileNetV2(weights='imagenet')
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 0.8rem;"><strong>Recommendation for this course:</strong> PyTorch — because of flexibility and wide adoption in computer vision research. But both work perfectly.</p>
+        </div>
+    </div>
+
+    <!-- Cheatsheet & Next steps -->
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 Quick Reference & Best Practices</h2>
+        </div>
+        <div class="card-body">
+            <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>🔹 <strong>Preprocessing is critical</strong> – Always normalize with ImageNet mean/std when using pre-trained weights.</li>
+                <li>🔹 <strong>model.eval()</strong> disables dropout/batch norm stats – mandatory for inference.</li>
+                <li>🔹 Use <code>torch.no_grad()</code> to disable gradient computation → faster inference & less memory.</li>
+                <li>🔹 For custom datasets: fine-tune last few layers (transfer learning) for better performance.</li>
+                <li>🔹 MobileNet → best for real-time / edge; ResNet → higher accuracy but slower.</li>
+            </ul>
+            <hr>
+            <div style="background: #eef3fc; border-radius: 1rem; padding: 1rem; text-align: center; margin-top: 0.8rem;">
+                🚀 <strong>Next step (Day 5):</strong> Object Detection with YOLO — find multiple objects in images and draw bounding boxes.
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        🧠 Day 4 complete — You've moved from traditional vision to deep learning. You can now load state-of-the-art models and classify any image.<br>
+        📦 Try running the Mini Project on your own photos. See how powerful pre-trained CNNs are!
+    </footer>
+</div>
+<script>
+    (function(){
+        console.log("%c🧠 Day 4: Deep Learning for Vision — CNNs & MobileNet classifier ready!", "color:#1a6b7c; font-weight:bold; font-size:13px");
+        console.log("%c💡 Pro tip: Always use .eval() and torch.no_grad() for inference to save memory.", "background:#eef2f5; color:#d65c2a; padding:2px 6px; border-radius:8px;");
+    })();
+</script>
+</body>
+</html>
