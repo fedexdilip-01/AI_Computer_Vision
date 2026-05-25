@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 1: Foundations & Image Basics | AI Computer Vision Program</title>
+    <!-- Google Fonts & simple reset for modern, clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f6f9fc;
+            font-family: 'Inter', sans-serif;
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* main container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* header / day banner */
+        .day-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0b3b5f, #1b4f72);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #0f2c3b, #1e5a7a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a627a;
+            margin-top: 0.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* card style grid */
+        .section-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 1.75rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .card:hover {
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            padding: 1.5rem 2rem 0.5rem 2rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+        .card-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e4663;
+        }
+        .card-header h2 i {
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+        .card-body {
+            padding: 1.5rem 2rem 2rem 2rem;
+        }
+
+        /* topics & tools list style */
+        .topic-list, .tool-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .topic-tag {
+            background: #eef2ff;
+            color: #1e4a76;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .tool-tag {
+            background: #e6f7f0;
+            color: #1e6f5c;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        /* practice / project blocks */
+        .practice-block, .project-block {
+            background: #fafdff;
+            border-left: 5px solid;
+            padding: 1.2rem 1.5rem;
+            border-radius: 1.2rem;
+            margin-top: 1rem;
+        }
+        .practice-block {
+            border-left-color: #2c8c6e;
+            background: #f9fefb;
+        }
+        .project-block {
+            border-left-color: #d97706;
+            background: #fffaf2;
+            margin-top: 1.5rem;
+        }
+        .block-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .code-snip {
+            background: #1e2a36;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0 0.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #e0e7ed, transparent);
+        }
+
+        /* two-col layout for Practice conversions */
+        .two-col {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .col {
+            flex: 1;
+            min-width: 200px;
+            background: #ffffffea;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            border: 1px solid #e9edf2;
+        }
+
+        .button-demo {
+            display: inline-block;
+            background: #1e4663;
+            color: white;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            text-decoration: none;
+            margin-top: 0.8rem;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .button-demo:hover {
+            background: #0f3550;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dce5ec;
+            font-size: 0.85rem;
+            color: #5d7184;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .card-header, .card-body {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="day-header">
+        <span class="badge">📅 7‑Day AI Computer Vision · Day 1</span>
+        <h1>Foundations & Image Basics</h1>
+        <div class="subhead">Pixels, Color Spaces, and the first step toward visual intelligence</div>
+    </div>
+
+    <div class="section-grid">
+        <!-- TOPICS CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📘 Topics</h2>
+            </div>
+            <div class="card-body">
+                <div class="topic-list">
+                    <span class="topic-tag">🧠 What is computer vision?</span>
+                    <span class="topic-tag">🎨 Pixels & images</span>
+                    <span class="topic-tag">🌈 RGB / Grayscale / HSV</span>
+                    <span class="topic-tag">📂 Loading, displaying, saving images</span>
+                </div>
+                <p style="margin-top: 0.5rem; color: #2c4c6e;">Understanding how machines “see”: from raw pixel matrices to meaningful representations. Learn why color spaces matter for tasks like object detection and image filtering.</p>
+            </div>
+        </div>
+
+        <!-- TOOLS CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🛠️ Tools & Libraries</h2>
+            </div>
+            <div class="card-body">
+                <div class="tool-list">
+                    <span class="tool-tag">OpenCV</span>
+                    <span class="tool-tag">Matplotlib</span>
+                    <span class="tool-tag">NumPy</span>
+                </div>
+                <p>Industry‑standard toolkit for image I/O, array manipulation, and visualization. We'll use them to build our first vision pipeline.</p>
+                <div class="code-snip">
+                    # Typical import block<br>
+                    import cv2<br>
+                    import numpy as np<br>
+                    import matplotlib.pyplot as plt
+                </div>
+            </div>
+        </div>
+
+        <!-- PRACTICE: CONVERSIONS & CHANNELS -->
+        <div class="card">
+            <div class="card-header">
+                <h2>⚙️ Practice: Color Space Conversions & Channel Manipulation</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Goals:</strong> Convert between RGB, Grayscale, HSV — split and merge color channels manually.</p>
+                <div class="two-col">
+                    <div class="col">
+                        <strong>🔁 RGB ↔ Grayscale</strong>
+                        <div class="code-snip" style="background: #2d3e4e; margin-top: 8px;">
+                            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                        </div>
+                    </div>
+                    <div class="col">
+                        <strong>🎨 RGB ↔ HSV</strong>
+                        <div class="code-snip" style="background: #2d3e4e;">
+                            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                        </div>
+                    </div>
+                </div>
+                <div class="practice-block">
+                    <div class="block-title">🧪 Hands-on Tasks</div>
+                    <ul style="margin-left: 1.2rem; margin-bottom: 0.75rem; color: #2d4f6e;">
+                        <li>Load an image (use any sample from disk or URL via OpenCV).</li>
+                        <li>Convert to grayscale and HSV, then display each using Matplotlib.</li>
+                        <li>Split the BGR image into its Blue, Green, and Red channels.</li>
+                        <li>Merge channels after modifying one (e.g., zero out blue channel → create custom effect).</li>
+                    </ul>
+                    <div class="code-snip">
+                        # Example: split and merge channels<br>
+                        b, g, r = cv2.split(img_bgr)<br>
+                        zeros_channel = np.zeros_like(b)<br>
+                        red_only = cv2.merge([zeros_channel, zeros_channel, r])<br>
+                        cv2.imshow('Red channel only', red_only)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MINI PROJECT: IMAGE COLOR EXTRACTOR -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🎯 Mini Project: Image Color Extractor</h2>
+            </div>
+            <div class="card-body">
+                <div class="project-block">
+                    <div class="block-title">🎨 Extract dominant color channel & display histograms</div>
+                    <p>Build a tool that loads any image, extracts individual Red, Green, Blue channels, and visualizes their intensity histograms. Identify which color channel dominates the image's look.</p>
+                    <div style="background: #eef3fc; border-radius: 1rem; padding: 1rem; margin: 1rem 0;">
+                        <strong>✨ Expected features:</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                            <li>Read image (support .jpg, .png)</li>
+                            <li>Compute histogram for each channel (256 bins)</li>
+                            <li>Plot original image + 3 histograms (R/G/B) on a single figure</li>
+                            <li>Optional: print which channel has highest average pixel intensity</li>
+                        </ul>
+                    </div>
+                    <div class="code-snip">
+                        # Pseudocode / core logic<br>
+                        import cv2, matplotlib.pyplot as plt<br>
+                        img = cv2.imread('sample.jpg')<br>
+                        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)<br>
+                        colors = ('red','green','blue')<br>
+                        for i, col in enumerate(colors):<br>
+                        &nbsp;&nbsp; hist = cv2.calcHist([img_rgb], [i], None, [256], [0,256])<br>
+                        &nbsp;&nbsp; plt.plot(hist, color=col)<br>
+                        plt.title('RGB Channel Histograms')<br>
+                        plt.show()
+                    </div>
+                    <div style="background: #f0f7ff; border-radius: 0.9rem; margin-top: 1rem; padding: 0.8rem;">
+                        <span style="font-weight: 600;">💡 Bonus challenge:</span> Overlay HSV histograms or compute the dominant color using K-means on pixel clusters.
+                    </div>
+                </div>
+                <!-- interactive concept (no actual backend but shows architecture) -->
+                <div style="margin-top: 1rem; background: #f6f2e8; border-radius: 1rem; padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <span>📁 Input image → </span>
+                        <span style="background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 20px;">split channels</span>
+                        <span>→ </span>
+                        <span style="background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 20px;">calcHist()</span>
+                        <span>→ </span>
+                        <span style="background: #facc15; padding: 0.2rem 0.6rem; border-radius: 20px;">📊 Dominant color analysis</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESOURCES & ADDITIONAL NOTES -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📚 Resources & Next Steps</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;">
+                    <div style="flex:1">
+                        <strong>📖 Theory references</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                            <li>OpenCV documentation: Image Basics</li>
+                            <li>“Digital Image Processing” – Gonzalez (concepts)</li>
+                            <li>Why HSV? Better for color segmentation under lighting changes</li>
+                        </ul>
+                    </div>
+                    <div style="flex:1">
+                        <strong>🧰 Datasets to experiment</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                            <li>COCO / CIFAR-10 small subset</li>
+                            <li>Your own photos (nature, objects, artworks)</li>
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <strong>✅ Day 1 Checklist</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.8rem;">
+                        <span>✔️ Understand pixel representation</span>
+                        <span>✔️ Perform RGB↔Grayscale↔HSV transforms</span>
+                        <span>✔️ Split & merge channels</span>
+                        <span>✔️ Build Color Extractor + histogram analysis</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; text-align: right; font-size: 0.85rem; border-top: 1px solid #e2edf2; padding-top: 1rem;">
+                    🧠 Part of 7‑Day AI Computer Vision · Mastery from pixel to perception
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        ⚡ Day 1 complete — tomorrow: Image processing & transformations (filters, edge detection, thresholding).<br>
+        🖼️ Keep coding: Every image tells a story through its pixels and channels.
+    </footer>
+</div>
+
+<!-- simple interactive note - pure css/js simulation of visual reminder, no backend but informative -->
+<script>
+    // optional interactive console reminder for learners (just a gentle log in devtools)
+    (function() {
+        console.log("%c📸 Day 1: Foundations & Image Basics", "color: #1e6f5c; font-size: 14px; font-weight: bold;");
+        console.log("%cTry this snippet in your own Python env:\nimport cv2, numpy as np, matplotlib.pyplot as plt\nimg = cv2.imread('path_to_image.jpg')\ngray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\nplt.imshow(gray, cmap='gray'); plt.show()", "background: #f0f2f5; color: #0f2c3b; padding: 4px; border-radius: 8px;");
+    })();
+</script>
+</body>
+</html>
