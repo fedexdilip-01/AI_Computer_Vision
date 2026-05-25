@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Day 2: Image Processing & Transformations | AI Computer Vision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f7fc;
+            font-family: 'Inter', sans-serif;
+            color: #0f2a38;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem 3.5rem;
+        }
+
+        /* Header styling */
+        .day-banner {
+            background: linear-gradient(115deg, #0b2b38 0%, #1b4f66 100%);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.2);
+        }
+        .badge-day {
+            display: inline-block;
+            background: #ffb347;
+            color: #1f3e48;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .day-banner h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+        .day-banner p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 85%;
+        }
+
+        /* card system */
+        .grid-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        .card {
+            background: white;
+            border-radius: 1.6rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .card-header {
+            padding: 1.3rem 2rem 0.2rem 2rem;
+            border-bottom: 2px solid #eef2f6;
+        }
+        .card-header h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #165a72;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .card-body {
+            padding: 1.4rem 2rem 2rem 2rem;
+        }
+
+        .topic-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .pill {
+            background: #e5f0f7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #146b87;
+        }
+
+        /* code & example blocks */
+        .code-block {
+            background: #0f212e;
+            color: #dcf2ff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 1rem 1.3rem;
+            border-radius: 1rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 1rem 0;
+            border-left: 3px solid #ffb347;
+        }
+        .example-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        .example-card {
+            background: #f9fdfe;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            flex: 1;
+            min-width: 220px;
+            border: 1px solid #e4edf2;
+            transition: all 0.2s;
+        }
+        .example-title {
+            font-weight: 800;
+            font-size: 1rem;
+            border-left: 3px solid #ff914d;
+            padding-left: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+        .highlight {
+            background: #fff5e8;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            border-left: 4px solid #e68a2e;
+            margin-top: 1rem;
+        }
+        .btn-mock {
+            background: #1d6f8f;
+            color: white;
+            border: none;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, #cbdde6, transparent);
+        }
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #5f7f91;
+            border-top: 1px solid #d4e2ec;
+            padding-top: 1.5rem;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 1rem;
+            }
+            .day-banner h1 {
+                font-size: 1.7rem;
+            }
+            .card-body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="day-banner">
+        <span class="badge-day">📸 DAY 2 · IMAGE TRANSFORMATIONS</span>
+        <h1>Image Processing & Transformations</h1>
+        <p>Geometric edits, blurring, edge detection, thresholding — build the visual pipeline for document cleanup</p>
+    </div>
+
+    <div class="grid-sections">
+        <!-- TOPICS CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📌 Core Topics</h2>
+            </div>
+            <div class="card-body">
+                <div class="topic-pills">
+                    <span class="pill">↔️ Resizing & Cropping</span>
+                    <span class="pill">🔄 Rotating & Flipping</span>
+                    <span class="pill">🌀 Image Filtering (Blur/Sharpen)</span>
+                    <span class="pill">⚡ Edge Detection (Sobel, Canny)</span>
+                    <span class="pill">🎛️ Thresholding & Binary Images</span>
+                    <span class="pill">🌓 Adaptive Thresholding</span>
+                </div>
+                <p style="margin-top: 1rem;">Transform raw pixels into cleaner, analyzable representations — essential for document scanning, object detection, and image enhancement.</p>
+            </div>
+        </div>
+
+        <!-- GEOMETRIC TRANSFORMATIONS - DETAILS + EXAMPLES -->
+        <div class="card">
+            <div class="card-header">
+                <h2>✂️ Geometric Operations: Resize, Crop, Rotate, Flip</h2>
+            </div>
+            <div class="card-body">
+                <div class="example-grid">
+                    <div class="example-card">
+                        <div class="example-title">📏 Resize</div>
+                        <code style="font-size:0.75rem;">cv2.resize(img, (width, height))</code>
+                        <div class="code-block" style="margin:0.5rem 0;">resized = cv2.resize(img, (640,480), interpolation=cv2.INTER_AREA)</div>
+                        <small>Preserve aspect ratio with fx/fy.</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">✂️ Crop</div>
+                        <code style="font-size:0.75rem;">img[y1:y2, x1:x2]</code>
+                        <div class="code-block" style="margin:0.5rem 0;">cropped = img[50:250, 100:300]</div>
+                        <small>Numpy slicing = ROI extraction.</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">🔄 Rotate</div>
+                        <code style="font-size:0.75rem;">cv2.getRotationMatrix2D + warpAffine</code>
+                        <div class="code-block" style="margin:0.5rem 0;">(h,w) = img.shape[:2]; M = cv2.getRotationMatrix2D((w/2,h/2), 45, 1.0); rotated = cv2.warpAffine(img, M, (w,h))</div>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">🪞 Flip</div>
+                        <code style="font-size:0.75rem;">cv2.flip(img, flipCode)</code>
+                        <div class="code-block" style="margin:0.5rem 0;">flip_horiz = cv2.flip(img, 1)  # 1 = horizontal, 0 = vertical, -1 = both</div>
+                    </div>
+                </div>
+                <div class="highlight">
+                    💡 <strong>Real‑world tip:</strong> When building a document scanner, always resize to a standard width first, then crop the region of interest (ROI) to reduce noise.
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTERING: BLUR, SHARPEN, EDGE DETECTION (SOBEL / CANNY) -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🌀 Image Filtering & Edge Detection</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; flex-wrap: wrap; gap: 1.2rem;">
+                    <div style="flex:1; min-width: 200px;">
+                        <strong>🧽 Blurring (Noise Reduction)</strong>
+                        <ul style="margin: 0.5rem 0 0.8rem 1.2rem;">
+                            <li>GaussianBlur: <code>cv2.GaussianBlur(img, (5,5), 0)</code></li>
+                            <li>Median blur: great for salt‑pepper noise</li>
+                            <li>Bilateral: preserves edges</li>
+                        </ul>
+                        <div class="code-block">
+                            gauss_blur = cv2.GaussianBlur(image, (7,7), 1.5)
+                        </div>
+                    </div>
+                    <div style="flex:1; min-width: 200px;">
+                        <strong>🔪 Sharpening (Enhance edges)</strong>
+                        <ul style="margin: 0.5rem 0 0.8rem 1.2rem;">
+                            <li>Kernel: [[0,-1,0], [-1,5,-1], [0,-1,0]]</li>
+                            <li>Apply using <code>cv2.filter2D()</code></li>
+                        </ul>
+                        <div class="code-block">
+                            kernel_sharpen = np.array([[0,-1,0],[-1,5,-1],[0,-1,0]])<br>
+                            sharp = cv2.filter2D(img, -1, kernel_sharpen)
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <strong>⚡ Edge Detection (Sobel & Canny)</strong>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <div class="example-title">Sobel Operator</div>
+                        <code>sobel_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)</code>
+                        <div class="code-block" style="margin-top: 0.4rem;">sobel_combined = cv2.magnitude(sobel_x, sobel_y)</div>
+                        <small>Gradient magnitude — direction matters.</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">Canny Edge Detector</div>
+                        <code>edges = cv2.Canny(gray, 50, 150)</code>
+                        <div class="code-block" style="margin-top: 0.4rem;"># Lower/upper thresholds control sensitivity <br> edges = cv2.Canny(blurred, 30, 100)</div>
+                        <small>Gold standard for edge detection: low noise + clear boundaries.</small>
+                    </div>
+                </div>
+                <div class="highlight">
+                    🧪 <strong>Practice task:</strong> Load a noisy image → apply Gaussian blur → Canny edge. Compare raw Canny vs blurred+Canny. See dramatic improvement!
+                </div>
+            </div>
+        </div>
+
+        <!-- THRESHOLDING & ADAPTIVE THRESHOLDING with examples -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🎚️ Thresholding & Binary Images</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Simple threshold:</strong> convert grayscale to binary (black & white) using a fixed cutoff value.</p>
+                <div class="code-block">
+                    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+                </div>
+                <p><strong>Adaptive Thresholding</strong> — handles uneven lighting (crucial for photos of documents taken with shadows).</p>
+                <div class="code-block">
+                    adaptive_thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+                </div>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <div class="example-title">🌓 Adaptive Mean</div>
+                        <code>ADAPTIVE_THRESH_MEAN_C</code>
+                        <small>Threshold = mean of neighborhood − constant</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">🌟 Gaussian Adaptive</div>
+                        <code>ADAPTIVE_THRESH_GAUSSIAN_C</code>
+                        <small>Weighted sum of neighborhood pixels</small>
+                    </div>
+                </div>
+                <div class="highlight">
+                    📄 <strong>Why it matters for scanners:</strong> documents clicked under desk lamp have bright center and dark corners. Adaptive thresholding produces clean binary output ready for OCR!
+                </div>
+            </div>
+        </div>
+
+        <!-- PRACTICE SECTION: Gaussian blur, Sobel/Canny + adaptive threshold -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🧪 Hands-on Practice</h2>
+            </div>
+            <div class="card-body">
+                <div style="background: #EFF7FA; border-radius: 1.2rem; padding: 1.2rem; margin-bottom: 1rem;">
+                    <strong>📌 Task 1: Apply Gaussian blur & edge detection pipeline</strong>
+                    <div class="code-block" style="margin-top: 0.6rem;">
+                        import cv2<br>
+                        img = cv2.imread('sample_doc.jpg')<br>
+                        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)<br>
+                        blurred = cv2.GaussianBlur(gray, (5,5), 0.8)<br>
+                        sobel_x = cv2.Sobel(blurred, cv2.CV_64F, 1, 0, ksize=3)<br>
+                        canny_edges = cv2.Canny(blurred, 40, 120)<br>
+                        cv2.imshow('Edges', canny_edges)
+                    </div>
+                    <span class="btn-mock">✨ Pro tip: Adjust kernel size (3,3) vs (7,7) to see noise vs detail tradeoff</span>
+                </div>
+
+                <div style="background: #FEF5E9; border-radius: 1.2rem; padding: 1.2rem;">
+                    <strong>📌 Task 2: Adaptive thresholding for uneven lighting (simulate real document)</strong>
+                    <div class="code-block" style="margin-top: 0.6rem;">
+                        gray = cv2.imread('shadow_doc.jpg', cv2.IMREAD_GRAYSCALE)<br>
+                        # simple threshold fails on shadows<br>
+                        _, simple_thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)<br>
+                        adaptive = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 4)<br>
+                        # visualize side by side: adaptive > simple for nonuniform light
+                    </div>
+                    <p style="margin-top: 0.5rem;">✔️ Compare outputs: adaptive thresholding extracts text even from shaded areas — perfect pre‑processing step for OCR (Tesseract).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MINI PROJECT: DOCUMENT SCANNER PREP (full pipeline) -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📄✨ Mini Project: Document Scanner Prep</h2>
+            </div>
+            <div class="card-body">
+                <div style="background: #262f36; border-radius: 1.4rem; padding: 1.4rem; color: #f0f6fa;">
+                    <span style="font-weight: 800; font-size: 1.2rem;">🔍 Goal: Clean a photo of a document</span>
+                    <p style="margin: 0.8rem 0;">Pipeline: Grayscale → Gaussian Blur → Edge Detection (Canny) → Adaptive Thresholding → final binary clean image ready for contour detection or OCR.</p>
+                    <div class="code-block" style="background: #0d1c26; margin: 0.8rem 0;">
+                        # Complete Document Scanner Prep (Stage 1)<br>
+                        import cv2<br>
+                        import numpy as np<br>
+                        <br>
+                        def prepare_document(image_path):<br>
+                        &nbsp;&nbsp;  img = cv2.imread(image_path)<br>
+                        &nbsp;&nbsp;  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)<br>
+                        &nbsp;&nbsp;  # reduce noise while preserving edges<br>
+                        &nbsp;&nbsp;  blurred = cv2.GaussianBlur(gray, (5,5), 0)<br>
+                        &nbsp;&nbsp;  # detect strong edges (used for contour finding later)<br>
+                        &nbsp;&nbsp;  edges = cv2.Canny(blurred, 50, 150)<br>
+                        &nbsp;&nbsp;  # adaptive threshold for clean binary map<br>
+                        &nbsp;&nbsp;  binary_clean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)<br>
+                        &nbsp;&nbsp;  return binary_clean, edges<br>
+                        <br>
+                        result_binary, edge_map = prepare_document("receipt_photo.jpg")<br>
+                        cv2.imwrite("scanned_ready.png", result_binary)
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
+                        <div style="background: #1e3e4a; border-radius: 1rem; padding: 0.7rem 1rem;">
+                            ✅ <strong>Step-by-step expected output</strong><br>
+                            1. Grayscale conversion removes color noise.<br>
+                            2. Gaussian blur reduces high-frequency noise.<br>
+                            3. Canny detects page boundaries.<br>
+                            4. Adaptive threshold produces uniform text regions.
+                        </div>
+                        <div style="background: #1e3e4a; border-radius: 1rem; padding: 0.7rem 1rem;">
+                            🚀 <strong>Next integration</strong><br>
+                            Combine with contour detection to find the largest quadrilateral → apply perspective transform → full scanner.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight" style="margin-top: 1rem;">
+                    🧪 <strong>Test on real images:</strong> Capture a photo of a book page with shadows. Run your pipeline and see the magic — clean binary with sharp text!
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY + BEST PRACTICES -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📝 Key Takeaways & Best Practices</h2>
+            </div>
+            <div class="card-body">
+                <div class="example-grid">
+                    <div class="example-card">
+                        <div class="example-title">✅ Always denoise before edge detection</div>
+                        <small>Gaussian blur reduces false edges from camera sensor noise.</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">🎯 Adaptive threshold for lighting variation</div>
+                        <small>Don't rely on fixed threshold for real-world documents.</small>
+                    </div>
+                    <div class="example-card">
+                        <div class="example-title">⚙️ Canny thresholds tune via trial</div>
+                        <small>Lower ratio (1:2 or 1:3) between low/high thresholds works well.</small>
+                    </div>
+                </div>
+                <hr>
+                <div style="background: #eef3f9; border-radius: 1rem; padding: 0.8rem; text-align: center;">
+                    📦 <strong>Next step for Day 3:</strong> Use your cleaned binary image for feature detection (corners, keypoints) — start building panorama stitcher.
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        🧠 Day 2 — Master geometric ops, filtering, and thresholding. Build your own document preprocessor.<br>
+        🔧 Ready code: apply Canny + adaptive threshold to any messy scan → perfect for OCR pipelines.
+    </footer>
+</div>
+<script>
+    // just a little console encouragement for learners
+    (function(){
+        console.log("%c📸 Day 2: Image Processing & Transformations - Ready! Try the document scanner pipeline.", "color: #1a6b7c; font-size:13px; font-weight:bold;");
+        console.log("%c💡 Snippet: cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)", "background:#eef2f5; color:#145a70; padding:2px 4px; border-radius:6px;");
+    })();
+</script>
+</body>
+</html>
