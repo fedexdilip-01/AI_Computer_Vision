@@ -172,4 +172,6 @@ https://fedexdilip-01.github.io/AI_Computer_Vision/day4.html</br>
 https://fedexdilip-01.github.io/AI_Computer_Vision/day5.html</br>
 https://fedexdilip-01.github.io/AI_Computer_Vision/day6.html</br>
 
+https://fedexdilip-01.github.io/AI_Computer_Vision/facenet.html</br>
+
 https://fedexdilip-01.github.io/AI_Computer_Vision/day7.html</br>
